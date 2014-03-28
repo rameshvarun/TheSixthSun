@@ -7,6 +7,8 @@ public class Planet : ISpaceObject {
 	public string name;
 	public string description;
 
+	public int subdivisions;
+
 	public Planet() {
 	}
 }

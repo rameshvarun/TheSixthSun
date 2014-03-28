@@ -3,37 +3,49 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class Triangle {
-	public int i, j, k;
-	public Triangle(int i, int j, int k) {
+	public Vector3 i, j, k;
+	public Vector2 i_uv, j_uv, k_uv;
+
+	public static List<Vector3> vertices;
+	public Triangle(Vector3 i, Vector3 j, Vector3 k) {
 		this.i = i;
 		this.j = j;
 		this.k = k;
 	}
+	public Triangle(int i, int j, int k) {
+		this.i = vertices[i];
+		this.j = vertices[j];
+		this.k = vertices[k];
+	}
 
-	public static int[] TriangleListToArray(List<Triangle> triangles) {
+	public static Vector3[] ToVertices(List<Triangle> triangles) {
+		Vector3[] vertices = new Vector3[triangles.Count*3];
+		for(int i = 0; i < triangles.Count; ++i) {
+			vertices[3*i] = triangles[i].i;
+			vertices[3*i + 1] = triangles[i].j;
+			vertices[3*i + 2] = triangles[i].k;
+		}
+		return vertices;
+	}
+
+	public static int[] ToIndices(List<Triangle> triangles) {
 		int[] indices = new int[triangles.Count*3];
 		for(int i = 0; i < triangles.Count; ++i) {
-			indices[3*i] = triangles[i].i;
-			indices[3*i + 1] = triangles[i].j;
-			indices[3*i + 2] = triangles[i].k;
+			indices[3*i] = 3*i;
+			indices[3*i + 1] = 3*i + 1;
+			indices[3*i + 2] = 3*i + 2;
 		}
 		return indices;
 	}
-	public static Vector3 trilinearToPoint(Vector3 tri, Vector3 A, Vector3 B, Vector3 C) {
-		Vector3 CB = B - C;
-		Vector3 CA = A - C;
 
-		float a = Vector3.Distance(B, C);
-		float b = Vector3.Distance(A, C);
-		float c = Vector3.Distance(A, B);
-
-		float alpha = (b*tri.y)/(a*tri.x + b*tri.y + c*tri.z);
-		float beta = (a*tri.x)/(a*tri.x + b*tri.y + c*tri.z);
-
-		return C + CB*alpha + CA*beta;
-	}
-	public Vector3 inCenter(List<Vector3> vertices) {
-		return trilinearToPoint(new Vector3(1, 1, 1), vertices[i], vertices[j], vertices[k]);
+	public static Vector2[] ToUVS(List<Triangle> triangles) {
+		Vector2[] uvs = new Vector2[triangles.Count*3];
+		for(int i = 0; i < triangles.Count; ++i) {
+			uvs[3*i] = triangles[i].i_uv;
+			uvs[3*i + 1] = triangles[i].j_uv;
+			uvs[3*i + 2] = triangles[i].k_uv;
+		}
+		return uvs;
 	}
 }
 
@@ -75,6 +87,7 @@ public class HexPlanet : MonoBehaviour {
 
 		triangles = new List<Triangle>();
 
+		Triangle.vertices = vertices;
 		triangles.Add(new Triangle(0, 11, 5));
 		triangles.Add(new Triangle(0, 5, 1));
 		triangles.Add(new Triangle(0, 1, 7));
@@ -99,19 +112,14 @@ public class HexPlanet : MonoBehaviour {
 		triangles.Add(new Triangle(8, 6, 7));
 		triangles.Add(new Triangle(9, 8, 1));
 
-		for(int i = 0; i < 5; ++i) {
+		for(int i = 0; i < 3; ++i) {
+			Debug.Log("Subdividing...");
 			//Subdivision phase
 			List<Triangle> newTriangles = new List<Triangle>();
 			foreach(Triangle tri in triangles) {
-
-				int a = vertices.Count;
-				vertices.Add((vertices[tri.i]/2 + vertices[tri.j]/2).normalized);
-
-				int b = vertices.Count;
-				vertices.Add((vertices[tri.j]/2 + vertices[tri.k]/2).normalized);
-
-				int c = vertices.Count;
-				vertices.Add((vertices[tri.i]/2 + vertices[tri.k]/2).normalized);
+				Vector3 a = (tri.i/2 + tri.j/2).normalized;
+				Vector3 b = (tri.j/2 + tri.k/2).normalized;
+				Vector3 c = (tri.i/2 + tri.k/2).normalized;
 
 				newTriangles.Add(new Triangle(tri.i, a, c));
 				newTriangles.Add(new Triangle(tri.j, b, a));
@@ -122,11 +130,23 @@ public class HexPlanet : MonoBehaviour {
 		}
 
 
-		mesh.vertices = vertices.ToArray();
-		mesh.triangles = Triangle.TriangleListToArray(triangles);
+		mesh.vertices = Triangle.ToVertices(triangles);
+		mesh.triangles = Triangle.ToIndices(triangles);
+
+		//Generate UV Coordinates
+		foreach(Triangle triangle in triangles) {
+			triangle.i_uv = new Vector2(0.5f, -0.94999f);
+			triangle.j_uv = new Vector2(0.8897f, -0.275f);
+			triangle.k_uv = new Vector2(0.1103f, -0.275f);
+		}
+		mesh.uv = Triangle.ToUVS(triangles);
+
+		//Calculate smoothed normals
+		List<Vector3> normals = new List<Vector3>(mesh.vertices.Length);
+		foreach(Vector3 vertex in mesh.vertices) normals.Add(vertex);
+		mesh.normals = normals.ToArray();
 
 		mesh.RecalculateBounds();
-		mesh.RecalculateNormals();
 
 	}
 	

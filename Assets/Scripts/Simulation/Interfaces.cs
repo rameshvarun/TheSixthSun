@@ -6,6 +6,7 @@ public interface ISpaceObject {
 }
 
 public interface ILandObject {
+	int vertex { get; }
 }
 
 public interface IInspectable {
