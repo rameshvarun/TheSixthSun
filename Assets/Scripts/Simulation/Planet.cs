@@ -9,6 +9,9 @@ public class Planet : ISpaceObject {
 	/// <summary>List of objects that currently inhabit the surface of the planet</summary> 
 	public List<ILandObject> landObjects;
 
+	/// <summary>Keep track of the terrain data</summary> 
+	public int[] terrain;
+
 	public string name;
 	public string description;
 

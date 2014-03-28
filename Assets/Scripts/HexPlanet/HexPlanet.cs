@@ -42,7 +42,7 @@ public class HexPlanet : MonoBehaviour {
 		vertex_to_node = new Dictionary<Vector3, int>();
 		node_to_vertex = new Dictionary<int, Vector3>();
 
-		CreatePlanet(3);
+		CreatePlanet(2);
 	}
 
 	public void CreatePlanet(int subdivisions) {
@@ -119,8 +119,9 @@ public class HexPlanet : MonoBehaviour {
 		mesh.RecalculateBounds();
 	}
 
+	public float rotateSpeed;
 	// Update is called once per frame
 	void Update () {
-
+		transform.Rotate(0, rotateSpeed*Time.deltaTime, 0);
 	}
 }

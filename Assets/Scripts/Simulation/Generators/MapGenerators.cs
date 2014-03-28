@@ -12,5 +12,10 @@ public static class MapGenerators {
 				}
 			}
 		}
+
+		Planet testPlanet = new Planet();
+		testPlanet.subdivisions = 2;
+		testPlanet.coordinate = new HexCoord(-2, -2);
+		gameState.planets.Add(testPlanet);
 	}
 }
