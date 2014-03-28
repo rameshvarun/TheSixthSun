@@ -6,69 +6,52 @@ using System.Collections.Generic;
 /// The main HexPlanet script.
 /// </summary>
 public class HexPlanet : MonoBehaviour {
-
-	public Vector2[] uv;
-	public List<Triangle> triangles;
-
+	/// <summary>The planet mesh built procedurally.</summary>
 	Mesh mesh;
+
+	/// <summary>Dictionary used to store graph in an edge-list format.</summary>
+	public Dictionary<int, HashSet<int>> graph;
+
+	/// <summary>Dictionary used to lookup the node number from a cartesian position</summary>
+	public Dictionary<Vector3, int> vertex_to_node;
+
+	/// <summary>Dictionary used to convert node ids to a position</summary>
+	public Dictionary<int, Vector3> node_to_vertex;
+
+	/// <summary>
+	/// Gets the node that is neares to a given position.
+	/// </summary>
+	/// <returns>The nearest node.</returns>
+	/// <param name="position">The position to be converted to a node number.</param>
+	public int getNearestNode(Vector3 position) {
+		int nearest_node = -1;
+		float nearest_distance = 0.0f;
+		foreach(KeyValuePair<Vector3, int> entry in vertex_to_node) {
+			float distance = Vector3.Distance(position, entry.Key);
+			if(nearest_node < 0 || distance < nearest_distance) {
+				nearest_node = entry.Value;
+				nearest_distance = distance;
+			}
+		}
+		return nearest_node;
+	}
 
 	// Use this for initialization
 	void Start () {
+		graph = new Dictionary<int, HashSet<int>>();
+		vertex_to_node = new Dictionary<Vector3, int>();
+		node_to_vertex = new Dictionary<int, Vector3>();
+
+		CreatePlanet(3);
+	}
+
+	public void CreatePlanet(int subdivisions) {
 		mesh = new Mesh();
 		GetComponent<MeshFilter>().mesh = mesh;
+		
+		List<Triangle> triangles = HexPlanetUtils.generateIcosohedron();
 
-
-		float t = (1.0f + Mathf.Sqrt(5.0f))/2.0f;
-
-		List<Vector3> vertices = new List<Vector3>(12);
-
-		vertices.Add(new Vector3(-1,  t,  0));
-		vertices.Add(new Vector3(1,  t,  0));
-		vertices.Add(new Vector3(-1,  -t,  0));
-		vertices.Add(new Vector3(1,  -t,  0));
-
-		vertices.Add(new Vector3(0, -1, t));
-		vertices.Add(new Vector3(0, 1, t));
-		vertices.Add(new Vector3(0, -1, -t));
-		vertices.Add(new Vector3(0, 1, -t));
-
-		vertices.Add(new Vector3(t, 0, -1));
-		vertices.Add(new Vector3(t, 0, 1));
-		vertices.Add(new Vector3(-t, 0, -1));
-		vertices.Add(new Vector3(-t, 0, 1));
-
-		for(int i = 0; i < vertices.Count; ++i) {
-			vertices[i] = vertices[i].normalized;
-		}
-
-		triangles = new List<Triangle>();
-
-		Triangle.vertices = vertices;
-		triangles.Add(new Triangle(0, 11, 5));
-		triangles.Add(new Triangle(0, 5, 1));
-		triangles.Add(new Triangle(0, 1, 7));
-		triangles.Add(new Triangle(0, 7, 10));
-		triangles.Add(new Triangle(0, 10, 11));
-
-		triangles.Add(new Triangle(1, 5, 9));
-		triangles.Add(new Triangle(5, 11, 4));
-		triangles.Add(new Triangle(11, 10, 2));
-		triangles.Add(new Triangle(10, 7, 6));
-		triangles.Add(new Triangle(7, 1, 8));
-
-		triangles.Add(new Triangle(3, 9, 4));
-		triangles.Add(new Triangle(3, 4, 2));
-		triangles.Add(new Triangle(3, 2, 6));
-		triangles.Add(new Triangle(3, 6, 8));
-		triangles.Add(new Triangle(3, 8, 9));
-
-		triangles.Add(new Triangle(4, 9, 5));
-		triangles.Add(new Triangle(2, 4, 11));
-		triangles.Add(new Triangle(6, 2, 10));
-		triangles.Add(new Triangle(8, 6, 7));
-		triangles.Add(new Triangle(9, 8, 1));
-
-		for(int i = 0; i < 3; ++i) {
+		for(int i = 0; i < subdivisions; ++i) {
 			Debug.Log("Subdividing...");
 			//Subdivision phase
 			List<Triangle> newTriangles = new List<Triangle>();
@@ -76,7 +59,7 @@ public class HexPlanet : MonoBehaviour {
 				Vector3 a = (tri.i/2 + tri.j/2).normalized;
 				Vector3 b = (tri.j/2 + tri.k/2).normalized;
 				Vector3 c = (tri.i/2 + tri.k/2).normalized;
-
+				
 				newTriangles.Add(new Triangle(tri.i, a, c));
 				newTriangles.Add(new Triangle(tri.j, b, a));
 				newTriangles.Add(new Triangle(tri.k, c, b));
@@ -84,11 +67,11 @@ public class HexPlanet : MonoBehaviour {
 			}
 			triangles = newTriangles;
 		}
-
-
+		
+		
 		mesh.vertices = Triangle.ToVertices(triangles);
 		mesh.triangles = Triangle.ToIndices(triangles);
-
+		
 		//Generate UV Coordinates
 		foreach(Triangle triangle in triangles) {
 			triangle.i_uv = new Vector2(0.5f, -0.94999f);
@@ -96,43 +79,46 @@ public class HexPlanet : MonoBehaviour {
 			triangle.k_uv = new Vector2(0.1103f, -0.275f);
 		}
 		mesh.uv = Triangle.ToUVS(triangles);
-
+		
 		//Calculate smoothed normals
 		List<Vector3> normals = new List<Vector3>(mesh.vertices.Length);
 		foreach(Vector3 vertex in mesh.vertices) normals.Add(vertex);
 		mesh.normals = normals.ToArray();
-
+		
 		Debug.Log("Creating node-edge graph from mesh.");
-
+		
 		//Generate node-edge graph
-		Dictionary<Vector3, int> vertex_to_node = new Dictionary<Vector3, int>();
 		int id = 0;
 		foreach(Vector3 vertex in mesh.vertices) {
 			if(!vertex_to_node.ContainsKey(vertex)) {
+				//Enable hashing in both directions
 				vertex_to_node[vertex] = id;
+				node_to_vertex[id] = vertex;
 				++id;
 			}
 		}
 
-		Dictionary<int, HashSet<int>> graph = new Dictionary<int, HashSet<int>>();
+		//Initialize empty edge lists
 		foreach(int node in vertex_to_node.Values) {
 			graph[node] = new HashSet<int>();
 		}
+
+		//Populate edge lists
 		foreach(Triangle triangle in triangles) {
 			//Add all possible edges to edge graph
 			graph[vertex_to_node[triangle.i]].Add(vertex_to_node[triangle.j]);
 			graph[vertex_to_node[triangle.i]].Add(vertex_to_node[triangle.k]);
-
+			
 			graph[vertex_to_node[triangle.j]].Add(vertex_to_node[triangle.i]);
 			graph[vertex_to_node[triangle.j]].Add(vertex_to_node[triangle.k]);
-
+			
 			graph[vertex_to_node[triangle.k]].Add(vertex_to_node[triangle.i]);
 			graph[vertex_to_node[triangle.k]].Add(vertex_to_node[triangle.j]);
 		}
-
+		
 		mesh.RecalculateBounds();
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
 

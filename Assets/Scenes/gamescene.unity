@@ -125,6 +125,7 @@ GameObject:
   - 92: {fileID: 1633537121}
   - 124: {fileID: 1633537120}
   - 81: {fileID: 1633537119}
+  - 114: {fileID: 1633537124}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -162,7 +163,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: .192156866, g: .301960796, b: .474509805, a: .0196078438}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: .0196078438}
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
@@ -189,10 +190,22 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1633537118}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalPosition: {x: 0, y: 1, z: -8.66234684}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
+--- !u!114 &1633537124
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1633537118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 321a4062c2b0cdc41ab292fbf6d8e81b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  displacement: {x: 0, y: 0, z: 0}
 --- !u!1 &1675998719
 GameObject:
   m_ObjectHideFlags: 0
@@ -268,7 +281,7 @@ GameObject:
   - 114: {fileID: 2026831461}
   - 135: {fileID: 2026831465}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: Planet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -285,8 +298,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aeff982ca037db7428e51789a68b744e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vertices: []
-  uv: []
 --- !u!23 &2026831462
 Renderer:
   m_ObjectHideFlags: 0
