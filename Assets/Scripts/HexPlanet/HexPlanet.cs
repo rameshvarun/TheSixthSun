@@ -2,55 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class Triangle {
-	public Vector3 i, j, k;
-	public Vector2 i_uv, j_uv, k_uv;
-
-	public static List<Vector3> vertices;
-	public Triangle(Vector3 i, Vector3 j, Vector3 k) {
-		this.i = i;
-		this.j = j;
-		this.k = k;
-	}
-	public Triangle(int i, int j, int k) {
-		this.i = vertices[i];
-		this.j = vertices[j];
-		this.k = vertices[k];
-	}
-
-	public static Vector3[] ToVertices(List<Triangle> triangles) {
-		Vector3[] vertices = new Vector3[triangles.Count*3];
-		for(int i = 0; i < triangles.Count; ++i) {
-			vertices[3*i] = triangles[i].i;
-			vertices[3*i + 1] = triangles[i].j;
-			vertices[3*i + 2] = triangles[i].k;
-		}
-		return vertices;
-	}
-
-	public static int[] ToIndices(List<Triangle> triangles) {
-		int[] indices = new int[triangles.Count*3];
-		for(int i = 0; i < triangles.Count; ++i) {
-			indices[3*i] = 3*i;
-			indices[3*i + 1] = 3*i + 1;
-			indices[3*i + 2] = 3*i + 2;
-		}
-		return indices;
-	}
-
-	public static Vector2[] ToUVS(List<Triangle> triangles) {
-		Vector2[] uvs = new Vector2[triangles.Count*3];
-		for(int i = 0; i < triangles.Count; ++i) {
-			uvs[3*i] = triangles[i].i_uv;
-			uvs[3*i + 1] = triangles[i].j_uv;
-			uvs[3*i + 2] = triangles[i].k_uv;
-		}
-		return uvs;
-	}
-}
-
+/// <summary>
+/// The main HexPlanet script.
+/// </summary>
 public class HexPlanet : MonoBehaviour {
-	public List<Vector3> vertices;
+
 	public Vector2[] uv;
 	public List<Triangle> triangles;
 
@@ -64,7 +20,7 @@ public class HexPlanet : MonoBehaviour {
 
 		float t = (1.0f + Mathf.Sqrt(5.0f))/2.0f;
 
-		vertices = new List<Vector3>(12);
+		List<Vector3> vertices = new List<Vector3>(12);
 
 		vertices.Add(new Vector3(-1,  t,  0));
 		vertices.Add(new Vector3(1,  t,  0));
@@ -146,8 +102,35 @@ public class HexPlanet : MonoBehaviour {
 		foreach(Vector3 vertex in mesh.vertices) normals.Add(vertex);
 		mesh.normals = normals.ToArray();
 
-		mesh.RecalculateBounds();
+		Debug.Log("Creating node-edge graph from mesh.");
 
+		//Generate node-edge graph
+		Dictionary<Vector3, int> vertex_to_node = new Dictionary<Vector3, int>();
+		int id = 0;
+		foreach(Vector3 vertex in mesh.vertices) {
+			if(!vertex_to_node.ContainsKey(vertex)) {
+				vertex_to_node[vertex] = id;
+				++id;
+			}
+		}
+
+		Dictionary<int, HashSet<int>> graph = new Dictionary<int, HashSet<int>>();
+		foreach(int node in vertex_to_node.Values) {
+			graph[node] = new HashSet<int>();
+		}
+		foreach(Triangle triangle in triangles) {
+			//Add all possible edges to edge graph
+			graph[vertex_to_node[triangle.i]].Add(vertex_to_node[triangle.j]);
+			graph[vertex_to_node[triangle.i]].Add(vertex_to_node[triangle.k]);
+
+			graph[vertex_to_node[triangle.j]].Add(vertex_to_node[triangle.i]);
+			graph[vertex_to_node[triangle.j]].Add(vertex_to_node[triangle.k]);
+
+			graph[vertex_to_node[triangle.k]].Add(vertex_to_node[triangle.i]);
+			graph[vertex_to_node[triangle.k]].Add(vertex_to_node[triangle.j]);
+		}
+
+		mesh.RecalculateBounds();
 	}
 	
 	// Update is called once per frame

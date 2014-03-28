@@ -3,7 +3,7 @@ using System.Collections;
 
 public class HexCoord
 {
-	//Stored in axial coordinates
+	/// <summary>HexCoords are stored in Axial coordinates</summary> 
 	private AxialCoord coordinate;
 
 	public HexCoord(int q, int r) {

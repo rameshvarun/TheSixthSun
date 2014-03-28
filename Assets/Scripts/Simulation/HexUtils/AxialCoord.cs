@@ -11,6 +11,8 @@ public struct AxialCoord {
 		this.q = q;
 		this.r = r;
 	}
+
+	/// <summary>Converts an axial coordinate to cube coordinates</summary> 
 	public CubeCoord toCubeCoord() {
 		return new CubeCoord(q, r, -q - r);
 	}
