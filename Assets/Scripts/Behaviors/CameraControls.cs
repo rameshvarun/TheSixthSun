@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿	using UnityEngine;
 using System.Collections;
 
 public class CameraControls : MonoBehaviour {
@@ -21,6 +21,7 @@ public class CameraControls : MonoBehaviour {
 	public float scrollSpeed = 10.0f;
 	public float minimumHeight = 2.0f;
 	public float maximumHeight = 35.0f;
+	public float minRotateRadius = 2.0f;
 
 	private CameraMode mode = CameraMode.Panning;
 	private GameObject inspectTarget;
@@ -137,14 +138,15 @@ public class CameraControls : MonoBehaviour {
 			#endif
 
 			if(rotateRadius > 3.5f) mode = CameraMode.Returning;
+			if(rotateRadius < minRotateRadius) rotateRadius = minRotateRadius;
 		}
 
 		if( mode == CameraMode.Returning ) {
 			Vector3 targetPosition = new Vector3(gridPosX + xDisplacement, cameraHeight, gridPosY);
 			Quaternion targetOrientation = Quaternion.LookRotation(new Vector3(gridPosX, 0, gridPosY) - targetPosition);
 
-			transform.position = Vector3.Lerp(transform.position, targetPosition, 0.1f);
-			transform.rotation = Quaternion.Lerp(transform.rotation, targetOrientation, 0.1f);
+			transform.position = Vector3.Lerp(transform.position, targetPosition, 5.0f*Time.deltaTime);
+			transform.rotation = Quaternion.Lerp(transform.rotation, targetOrientation, 5.0f*Time.deltaTime);
 
 			if(Vector3.Distance(transform.position, targetPosition) < 0.1f)
 				mode = CameraMode.Panning;

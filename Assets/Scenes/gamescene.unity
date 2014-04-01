@@ -285,6 +285,7 @@ MonoBehaviour:
   scrollSpeed: 10
   minimumHeight: 2
   maximumHeight: 35
+  minRotateRadius: 2
 --- !u!45 &1633537125
 Skybox:
   m_ObjectHideFlags: 0
