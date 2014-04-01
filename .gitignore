@@ -9,7 +9,6 @@ Bin/
 # Visual Studio / MonoDevelop generated #
 # ===================================== #
 ExportedObj/
-obj/
 *.svd
 *.userprefs
 /*.csproj
