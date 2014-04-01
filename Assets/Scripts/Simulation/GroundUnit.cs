@@ -13,4 +13,12 @@ public class GroundUnit : ILandObject, IUnit
 	public int node { get; set; }
 	public Player owner { get; set; }
 	public float hp { get; set; }
+
+	public string type;
+
+	public GroundUnit(int node, string type, Player owner) {
+		this.node = node;
+		this.type = type;
+		this.owner = owner;
+	}
 }

@@ -36,22 +36,29 @@ public class HexPlanet : MonoBehaviour {
 		return nearest_node;
 	}
 
+	public Vector3 getNodePosition(int node) {
+		return node_to_vertex[node];
+	}
+
+	public Quaternion getNodeOrientation(int node) {
+		return Quaternion.LookRotation(Vector3.Cross(getNodePosition(node).normalized, Vector3.forward), getNodePosition(node).normalized);
+	}
+
 	// Use this for initialization
 	void Start () {
+	}
+
+	public void CreatePlanet() {
 		graph = new Dictionary<int, HashSet<int>>();
 		vertex_to_node = new Dictionary<Vector3, int>();
 		node_to_vertex = new Dictionary<int, Vector3>();
 
-		CreatePlanet(2);
-	}
-
-	public void CreatePlanet(int subdivisions) {
 		mesh = new Mesh();
 		GetComponent<MeshFilter>().mesh = mesh;
 		
 		List<Triangle> triangles = HexPlanetUtils.generateIcosohedron();
 
-		for(int i = 0; i < subdivisions; ++i) {
+		for(int i = 0; i < GetComponent<PlanetBehavior>().planet.subdivisions; ++i) {
 			Debug.Log("Subdividing...");
 			//Subdivision phase
 			List<Triangle> newTriangles = new List<Triangle>();
@@ -118,10 +125,9 @@ public class HexPlanet : MonoBehaviour {
 		
 		mesh.RecalculateBounds();
 	}
-
-	public float rotateSpeed;
+	
 	// Update is called once per frame
 	void Update () {
-		transform.Rotate(0, rotateSpeed*Time.deltaTime, 0);
+
 	}
 }

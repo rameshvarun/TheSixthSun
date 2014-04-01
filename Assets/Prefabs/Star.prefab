@@ -29,7 +29,7 @@ GameObject:
   - 4: {fileID: 400002}
   - 108: {fileID: 10800000}
   m_Layer: 0
-  m_Name: Point light
+  m_Name: StarLight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -95,8 +95,8 @@ Light:
   m_Enabled: 1
   serializedVersion: 3
   m_Type: 2
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1
+  m_Color: {r: 1, g: .931034446, b: 0, a: 1}
+  m_Intensity: .720000029
   m_Range: 100
   m_SpotAngle: 30
   m_CookieSize: 10

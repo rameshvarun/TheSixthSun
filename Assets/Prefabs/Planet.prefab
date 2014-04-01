@@ -12,6 +12,7 @@ GameObject:
   - 23: {fileID: 2300000}
   - 114: {fileID: 11400000}
   - 135: {fileID: 13500000}
+  - 114: {fileID: 11400002}
   m_Layer: 0
   m_Name: Planet
   m_TagString: Planet
@@ -69,7 +70,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aeff982ca037db7428e51789a68b744e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotateSpeed: 5
+--- !u!114 &11400002
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7b8e1e1cd3b049478b9032e503b94f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rotateSpeed: 10
 --- !u!135 &13500000
 SphereCollider:
   m_ObjectHideFlags: 1
