@@ -12,8 +12,19 @@ public struct CubeCoord {
 		return new AxialCoord(x, y);
 	}
 
-	//TODO: Implement Equals
-	//TODO: Implement GetHashCode
+	public override bool Equals(object obj) {
+		if(obj is CubeCoord) {
+			CubeCoord c = (CubeCoord)obj;
+			return (x == c.x) && (y == c.y) && (z == c.z);
+		}
+		else {
+			return false;
+		}
+	}
+
+	public override int GetHashCode() {
+		return x.GetHashCode() ^ y.GetHashCode() ^ z.GetHashCode();
+	}
 
 	public override string ToString() {
 		return string.Format ("<{0}, {1}, {2}>", x, y, z);

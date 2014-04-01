@@ -3,10 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class GameState {
-	//Information about map
+	/// <summary>The hex grid that stores all possible space locations.</summary>
 	public HexGrid grid = new HexGrid();
-	public List<Planet> planets = new List<Planet>();
+	
 	public List<Player> players = new List<Player>();
+
+	public List<Planet> planets = new List<Planet>();
+	public List<Star> stars = new List<Star>();
 
 	public GameState() {
 	}

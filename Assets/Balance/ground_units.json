@@ -1,0 +1,12 @@
+{
+	"colonist" : {
+		"move" : 1,
+		"maxhp" : 10,
+		"description" : "Colonist units can be used to found cities."
+	},
+	"marine" : {
+		"move" : 1,
+		"maxhp" : 10,
+		"description" : "Marine units are basic infantry."
+	}
+}

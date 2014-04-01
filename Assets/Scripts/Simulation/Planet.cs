@@ -7,7 +7,7 @@ public class Planet : ISpaceObject {
 	public HexCoord coordinate { get; set; }
 
 	/// <summary>List of objects that currently inhabit the surface of the planet</summary> 
-	public List<ILandObject> landObjects;
+	public List<ILandObject> landObjects = new List<ILandObject>();
 
 	/// <summary>Keep track of the terrain data</summary> 
 	public int[] terrain;
@@ -18,6 +18,10 @@ public class Planet : ISpaceObject {
 	/// <summary>The number of subdivisions required to get a sphere of the correct resolution</summary> 
 	public int subdivisions;
 
-	public Planet() {
+	public Planet(HexCoord coordinate, string name, string description, int subdivisions) {
+		this.coordinate = coordinate;
+		this.name = name;
+		this.description = description;
+		this.subdivisions = subdivisions;
 	}
 }

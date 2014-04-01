@@ -25,7 +25,7 @@ public class CameraControls : MonoBehaviour {
 	private CameraMode mode = CameraMode.Panning;
 	private GameObject inspectTarget;
 
-	public GameObject gameController;
+	private GameObject gameController;
 
 	// Use this for initialization
 	void Start () {

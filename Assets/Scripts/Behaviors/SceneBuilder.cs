@@ -8,10 +8,12 @@ public class SceneBuilder : MonoBehaviour {
 	public Transform hexTile;
 	public Transform planet;
 
+	public Transform star;
+
 	// Use this for initialization
 	void Start () {
 		GameState.Instance = new GameState();
-		MapGenerators.TestMap(GameState.Instance);
+		MapGenerators.BasicMap(GameState.Instance);
 
 		//Create empty space grid
 		foreach(KeyValuePair<HexCoord, int> tile in GameState.Instance.grid.tiles) {
@@ -25,7 +27,12 @@ public class SceneBuilder : MonoBehaviour {
 			Instantiate(planet, p.coordinate.toPosition(1.0f) + new Vector3(0, 0.5f, 0),Quaternion.identity);
 		}
 
-		//TODO: Spawn in Stars
+		//Spawn in Stars
+		foreach(Star s in GameState.Instance.stars) {
+			Debug.Log("Star at " + s.coordinate, this);
+			Transform transform = (Transform)Instantiate(star, s.coordinate.toPosition(1.0f) + new Vector3(0, 0.5f, 0),Quaternion.identity);
+			transform.GetComponent<StarBehavior>().star = s; //Give behavior a link to the star object
+		}
 	}
 	
 	// Update is called once per frame
