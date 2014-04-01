@@ -305,6 +305,7 @@ GameObject:
   - 33: {fileID: 1782000141}
   - 65: {fileID: 1782000140}
   - 23: {fileID: 1782000139}
+  - 114: {fileID: 1782000143}
   m_Layer: 0
   m_Name: Colonist
   m_TagString: Untagged
@@ -363,3 +364,14 @@ Transform:
   m_LocalScale: {x: .100000001, y: .100000001, z: .100000001}
   m_Children: []
   m_Father: {fileID: 0}
+--- !u!114 &1782000143
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1782000138}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89ce7ea4e949ada4da3cf588ce45302c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

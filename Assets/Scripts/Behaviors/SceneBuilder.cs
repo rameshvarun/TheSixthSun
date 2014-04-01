@@ -25,7 +25,6 @@ public class SceneBuilder : MonoBehaviour {
 
 		//Create empty space grid
 		foreach(KeyValuePair<HexCoord, int> tile in GameState.Instance.grid.tiles) {
-			Debug.Log("HexTile at " + tile.Key, this);
 			Instantiate(hexTile,tile.Key.toPosition(1.0f),Quaternion.identity);
 		}
 
@@ -46,6 +45,8 @@ public class SceneBuilder : MonoBehaviour {
 					unitTransform.parent = transform;
 					unitTransform.localPosition = transform.GetComponent<HexPlanet>().getNodePosition(groundUnit.node);
 					unitTransform.localRotation = transform.GetComponent<HexPlanet>().getNodeOrientation(groundUnit.node);
+
+					unitTransform.GetComponent<GroundUnitBehavior>().groundUnit = groundUnit;
 				}
 			}
 		}
