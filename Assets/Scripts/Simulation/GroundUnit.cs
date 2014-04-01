@@ -15,7 +15,7 @@ public class GroundUnit : ILandObject, IUnit
 	public float hp { get; set; }
 
 	/// <summary>Whether or not the unit has already performed an action this turn. </summary>
-	bool hasMoved;
+	public bool hasMoved;
 
 	/// <summary>Used to store the type of ground unit.</summary>
 	public string type;
@@ -29,7 +29,7 @@ public class GroundUnit : ILandObject, IUnit
 	}
 
 	public bool canMove() { return !hasMoved; }
-
+	
 	private static JsonData balance = null;
 	public static JsonData Balance {
 		get {
