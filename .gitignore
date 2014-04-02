@@ -5,6 +5,9 @@ Temp/
 Library/
 Bin/
 
+# Code documentation
+Documentation/
+
 # ===================================== #
 # Visual Studio / MonoDevelop generated #
 # ===================================== #
