@@ -7,7 +7,8 @@ public class CameraControls : MonoBehaviour {
 		/// <summary>Panning in the global space view.</summary>
 		Panning,
 		Planet,
-		Returning
+		Returning,
+		Move
 	};
 
 	//Panning mode values
@@ -88,6 +89,7 @@ public class CameraControls : MonoBehaviour {
 				RaycastHit hit;
 
 				if( Physics.Raycast(ray, out hit) ) {
+					//Planets can be inspected from space
 					if(hit.collider.gameObject.tag == "Planet") {
 						inspectTarget = hit.collider.gameObject;
 						mode = CameraMode.Planet;
@@ -139,6 +141,24 @@ public class CameraControls : MonoBehaviour {
 
 			if(rotateRadius > 3.5f) mode = CameraMode.Returning;
 			if(rotateRadius < minRotateRadius) rotateRadius = minRotateRadius;
+
+			//Selecting an object
+			if(Input.GetMouseButtonUp(0)){
+				Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+				RaycastHit hit;
+				if(Physics.Raycast(ray, out hit)) {
+					if(hit.collider.gameObject.tag == "GroundUnit") {
+						mode = CameraMode.Move;
+						previousMode = CameraMode.Planet;
+						moveTarget = hit.collider.gameObject;
+					}
+				}
+			}
+		}
+
+		if(mode == CameraMode.Move) {
+			transform.LookAt(moveTarget.transform);
+			transform.position = moveTarget.GetComponent<UnitBehavior>().getInspectCameraPosition();
 		}
 
 		if( mode == CameraMode.Returning ) {
@@ -152,6 +172,19 @@ public class CameraControls : MonoBehaviour {
 				mode = CameraMode.Panning;
 		}
 	}
+
+	void OnGUI() {
+		if(mode == CameraMode.Move) {
+			if (GUI.Button(new Rect(10, 10, 150, 100), "Back"))
+				mode = previousMode;
+
+			if(moveTarget.GetComponent<UnitBehavior>().MoveGUI())
+				mode = previousMode;
+		}
+	}
+
+	private GameObject moveTarget;
+	private CameraMode previousMode;
 
 	Vector3 inspectDisplacement;
 	float rotateRadius;

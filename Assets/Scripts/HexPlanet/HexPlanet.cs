@@ -44,6 +44,42 @@ public class HexPlanet : MonoBehaviour {
 		return Quaternion.LookRotation(Vector3.Cross(getNodePosition(node).normalized, Vector3.forward), getNodePosition(node).normalized);
 	}
 
+	public int[] getNodeNeigbors(int node) {
+		int[] neighbors = new int[graph[node].Count];
+		graph[node].CopyTo(neighbors);
+		return neighbors;
+	}
+
+	public HashSet<int> getMovementRange(int startNode, int range) {
+		var moveableTiles = new HashSet<int>();
+
+		var searchQueue = new Queue<int>();
+		var ranges = new Dictionary<int, int>();
+
+		searchQueue.Enqueue(startNode);
+		ranges[startNode] = 0;
+
+		while(searchQueue.Count > 0) {
+			int currentNode = searchQueue.Dequeue();
+
+			if(ranges[currentNode] <= range) {
+				moveableTiles.Add(currentNode);
+
+				foreach(int neighbor in getNodeNeigbors(currentNode)){
+					if(!ranges.ContainsKey(neighbor)) {
+						//TODO: Also confirm that this is a movable square
+
+						ranges[neighbor] = ranges[currentNode] + 1;
+						searchQueue.Enqueue(neighbor);
+					}
+				}
+			}
+		}
+
+		moveableTiles.Remove(startNode);
+		return moveableTiles;
+	}
+
 	// Use this for initialization
 	void Start () {
 	}

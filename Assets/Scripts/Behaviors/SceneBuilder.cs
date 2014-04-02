@@ -25,16 +25,15 @@ public class SceneBuilder : MonoBehaviour {
 
 		//Create empty space grid
 		foreach(KeyValuePair<HexCoord, int> tile in GameState.Instance.grid.tiles) {
-			Debug.Log("HexTile at " + tile.Key, this);
 			Instantiate(hexTile,tile.Key.toPosition(1.0f),Quaternion.identity);
 		}
 
 		//Spawn in planets
 		foreach(Planet p in GameState.Instance.planets) {
 			Debug.Log("Planet at " + p.coordinate, this);
-			Transform transform = (Transform)Instantiate(planet, p.coordinate.toPosition(1.0f) + new Vector3(0, 0.5f, 0),Quaternion.identity);
-			transform.GetComponent<PlanetBehavior>().planet = p; //Link behavior to data object
-			transform.GetComponent<HexPlanet>().CreatePlanet();
+			Transform planetTransform = (Transform)Instantiate(planet, p.coordinate.toPosition(1.0f) + new Vector3(0, 0.5f, 0),Quaternion.identity);
+			planetTransform.GetComponent<PlanetBehavior>().planet = p; //Link behavior to data object
+			planetTransform.GetComponent<HexPlanet>().CreatePlanet();
 
 			//Spawn all ground units on the surface
 			foreach(ILandObject landObject in p.landObjects) {
@@ -43,9 +42,12 @@ public class SceneBuilder : MonoBehaviour {
 
 					Debug.Log("Ground unit on node " + landObject.node);
 					Transform unitTransform = (Transform)Instantiate(groundUnits[groundUnit.type]);
-					unitTransform.parent = transform;
-					unitTransform.localPosition = transform.GetComponent<HexPlanet>().getNodePosition(groundUnit.node);
-					unitTransform.localRotation = transform.GetComponent<HexPlanet>().getNodeOrientation(groundUnit.node);
+					unitTransform.parent = planetTransform;
+					unitTransform.localPosition = planetTransform.GetComponent<HexPlanet>().getNodePosition(groundUnit.node);
+					unitTransform.localRotation = planetTransform.GetComponent<HexPlanet>().getNodeOrientation(groundUnit.node);
+
+					unitTransform.GetComponent<GroundUnitBehavior>().groundUnit = groundUnit;
+					unitTransform.GetComponent<GroundUnitBehavior>().planet = planetTransform;
 				}
 			}
 		}
