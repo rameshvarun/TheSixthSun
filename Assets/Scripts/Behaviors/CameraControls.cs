@@ -157,8 +157,11 @@ public class CameraControls : MonoBehaviour {
 		}
 
 		if(mode == CameraMode.Move) {
-			transform.LookAt(moveTarget.transform);
-			transform.position = moveTarget.GetComponent<UnitBehavior>().getInspectCameraPosition();
+			Quaternion targetRotation = Quaternion.LookRotation(moveTarget.transform.position - transform.position);
+			transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, 10.0f*Time.deltaTime);
+
+			Vector3 targetPosition = moveTarget.GetComponent<UnitBehavior>().getInspectCameraPosition();
+			transform.position = Vector3.Lerp(transform.position, targetPosition, 5.0f*Time.deltaTime);
 		}
 
 		if( mode == CameraMode.Returning ) {
