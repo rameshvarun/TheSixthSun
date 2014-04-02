@@ -17,6 +17,12 @@ public interface ILandObject {
 public interface IUnit {
 	Player owner { get; }
 	float hp { get; }
+
+	/// <summary>
+	/// This function should return if the unit is able to make a new move this turn.
+	/// This can be used to cycle through all units, ensuring that the player has made all possible moves.
+	/// </summary>
+	bool canMove();
 }
 
 public interface IInspectable {

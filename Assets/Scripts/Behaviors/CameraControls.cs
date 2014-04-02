@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿	using UnityEngine;
 using System.Collections;
 
 public class CameraControls : MonoBehaviour {
@@ -7,7 +7,8 @@ public class CameraControls : MonoBehaviour {
 		/// <summary>Panning in the global space view.</summary>
 		Panning,
 		Planet,
-		Returning
+		Returning,
+		Move
 	};
 
 	//Panning mode values
@@ -21,6 +22,7 @@ public class CameraControls : MonoBehaviour {
 	public float scrollSpeed = 10.0f;
 	public float minimumHeight = 2.0f;
 	public float maximumHeight = 35.0f;
+	public float minRotateRadius = 2.0f;
 
 	private CameraMode mode = CameraMode.Panning;
 	private GameObject inspectTarget;
@@ -87,6 +89,7 @@ public class CameraControls : MonoBehaviour {
 				RaycastHit hit;
 
 				if( Physics.Raycast(ray, out hit) ) {
+					//Planets can be inspected from space
 					if(hit.collider.gameObject.tag == "Planet") {
 						inspectTarget = hit.collider.gameObject;
 						mode = CameraMode.Planet;
@@ -137,19 +140,54 @@ public class CameraControls : MonoBehaviour {
 			#endif
 
 			if(rotateRadius > 3.5f) mode = CameraMode.Returning;
+			if(rotateRadius < minRotateRadius) rotateRadius = minRotateRadius;
+
+			//Selecting an object
+			if(Input.GetMouseButtonUp(0)){
+				Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+				RaycastHit hit;
+				if(Physics.Raycast(ray, out hit)) {
+					if(hit.collider.gameObject.tag == "GroundUnit") {
+						mode = CameraMode.Move;
+						previousMode = CameraMode.Planet;
+						moveTarget = hit.collider.gameObject;
+					}
+				}
+			}
+		}
+
+		if(mode == CameraMode.Move) {
+			Quaternion targetRotation = Quaternion.LookRotation(moveTarget.transform.position - transform.position);
+			transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, 10.0f*Time.deltaTime);
+
+			Vector3 targetPosition = moveTarget.GetComponent<UnitBehavior>().getInspectCameraPosition();
+			transform.position = Vector3.Lerp(transform.position, targetPosition, 5.0f*Time.deltaTime);
 		}
 
 		if( mode == CameraMode.Returning ) {
 			Vector3 targetPosition = new Vector3(gridPosX + xDisplacement, cameraHeight, gridPosY);
 			Quaternion targetOrientation = Quaternion.LookRotation(new Vector3(gridPosX, 0, gridPosY) - targetPosition);
 
-			transform.position = Vector3.Lerp(transform.position, targetPosition, 0.1f);
-			transform.rotation = Quaternion.Lerp(transform.rotation, targetOrientation, 0.1f);
+			transform.position = Vector3.Lerp(transform.position, targetPosition, 5.0f*Time.deltaTime);
+			transform.rotation = Quaternion.Lerp(transform.rotation, targetOrientation, 5.0f*Time.deltaTime);
 
 			if(Vector3.Distance(transform.position, targetPosition) < 0.1f)
 				mode = CameraMode.Panning;
 		}
 	}
+
+	void OnGUI() {
+		if(mode == CameraMode.Move) {
+			if (GUI.Button(new Rect(10, 10, 150, 100), "Back"))
+				mode = previousMode;
+
+			if(moveTarget.GetComponent<UnitBehavior>().MoveGUI())
+				mode = previousMode;
+		}
+	}
+
+	private GameObject moveTarget;
+	private CameraMode previousMode;
 
 	Vector3 inspectDisplacement;
 	float rotateRadius;

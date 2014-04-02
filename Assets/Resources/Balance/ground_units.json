@@ -1,6 +1,6 @@
 {
 	"colonist" : {
-		"move" : 1,
+		"move" : 2,
 		"maxhp" : 10,
 		"description" : "Colonist units can be used to found cities."
 	},
