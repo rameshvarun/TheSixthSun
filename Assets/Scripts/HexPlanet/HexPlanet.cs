@@ -46,12 +46,23 @@ public class HexPlanet : MonoBehaviour {
 		return Quaternion.LookRotation(Vector3.Cross(getNodePosition(node).normalized, Vector3.forward), getNodePosition(node).normalized);
 	}
 
+	/// <summary>
+	/// Gets the indices of the nodes that neigbor the current node index.
+	/// </summary>
+	/// <returns>An integer array of all of the neigboring node indices.</returns>
+	/// <param name="node">The initial node index.</param>
 	public int[] getNodeNeigbors(int node) {
 		int[] neighbors = new int[graph[node].Count];
 		graph[node].CopyTo(neighbors);
 		return neighbors;
 	}
 
+	/// <summary>
+	/// Returns all the nodes within a certain movement range of the given tile.
+	/// </summary>
+	/// <returns>A HashSet<int> of moveable nodes.</returns>
+	/// <param name="startNode">The start node index.</param>
+	/// <param name="range">The range that the given unit can move.</param>
 	public HashSet<int> getMovementRange(int startNode, int range) {
 		var moveableTiles = new HashSet<int>();
 
@@ -86,6 +97,9 @@ public class HexPlanet : MonoBehaviour {
 	void Start () {
 	}
 
+	/// <summary>
+	/// When called, this function actually constructs the planet mesh, subdivides, and calculates the vertex-edge graph.
+	/// </summary>
 	public void CreatePlanet() {
 		graph = new Dictionary<int, HashSet<int>>();
 		vertex_to_node = new Dictionary<Vector3, int>();

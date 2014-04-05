@@ -19,6 +19,8 @@ public class SpaceshipBehavior : UnitBehavior {
 	// Update is called once per frame
 	void Update () {
 		transform.position = Vector3.Lerp(transform.position, spaceship.coordinate.toPosition(), 5*Time.deltaTime );
+
+		//TODO: Spaceships need to intelligently distribute themselves on the tile.
 	}
 
 	public void clearMoveSelectors() {
@@ -26,6 +28,10 @@ public class SpaceshipBehavior : UnitBehavior {
 			Destroy(selector.gameObject);
 		}
 		moveSelectors.Clear();
+	}
+
+	public override void cleanUp() {
+		this.clearMoveSelectors();
 	}
 
 	public override Vector3 getInspectCameraPosition() {

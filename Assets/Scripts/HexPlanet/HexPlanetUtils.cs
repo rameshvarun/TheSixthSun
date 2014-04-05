@@ -36,6 +36,7 @@ public static class HexPlanetUtils
 
 		Triangle.vertices = vertices;
 
+		//TODO: Convert to use the Vector3 constructor, and not the int constructor
 		triangles.Add(new Triangle(vertices[0], vertices[11], vertices[5]));
 		triangles.Add(new Triangle(0, 5, 1));
 		triangles.Add(new Triangle(0, 1, 7));

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 public class HexCoord
 {
+	/// <summary>The default value for the radius of a hex tile, used by one of the overloaded versions of toPosition.</summary>
 	public const float DEFAULT_SIZE = 1.0f;
 
 	/// <summary>HexCoords are stored in Axial coordinates</summary> 
