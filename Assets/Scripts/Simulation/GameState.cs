@@ -13,6 +13,7 @@ public class GameState {
 
 	public List<Planet> planets = new List<Planet>();
 	public List<Star> stars = new List<Star>();
+	public List<ISpaceUnit> spaceUnits = new List<ISpaceUnit>();
 
 	public GameState() {
 	}

@@ -15,10 +15,15 @@ public class SceneBuilder : MonoBehaviour {
 	public List<Transform> groundUnits_values;
 	private Dictionary<string, Transform> groundUnits = new Dictionary<string, Transform>();
 
+	public List<string> spaceUnits_keys;
+	public List<Transform> spaceUnits_values;
+	private Dictionary<string, Transform> spaceUnits = new Dictionary<string, Transform>();
+
 	// Use this for initialization
 	void Start () {
 		//Sew up dictionaries from lists
 		for(int i = 0; i < groundUnits_keys.Count; ++i) groundUnits[groundUnits_keys[i]] = groundUnits_values[i];
+		for(int i = 0; i < spaceUnits_keys.Count; ++i) spaceUnits[spaceUnits_keys[i]] = spaceUnits_values[i];
 
 		GameState.Instance = new GameState();
 		MapGenerators.BasicMap(GameState.Instance);
@@ -57,6 +62,18 @@ public class SceneBuilder : MonoBehaviour {
 			Debug.Log("Star at " + s.coordinate, this);
 			Transform transform = (Transform)Instantiate(star, s.coordinate.toPosition(1.0f) + new Vector3(0, 0.5f, 0),Quaternion.identity);
 			transform.GetComponent<StarBehavior>().star = s; //Give behavior a link to the star object
+		}
+
+		//Spawn in spaceunits
+		foreach(ISpaceUnit spaceUnit in GameState.Instance.spaceUnits) {
+			if(spaceUnit is Spaceship) {
+				Spaceship spaceship = (Spaceship)spaceUnit;
+
+				Transform spaceshipTransform = (Transform)Instantiate(spaceUnits[spaceship.type], spaceship.coordinate.toPosition(1.0f), Quaternion.identity);
+				spaceshipTransform.GetComponent<SpaceshipBehavior>().spaceship = spaceship;
+			}
+			else if(spaceUnit is Fleet) {
+			}
 		}
 	}
 	

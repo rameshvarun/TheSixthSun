@@ -111,6 +111,12 @@ public class CameraControls : MonoBehaviour {
 						inspectDisplacement = inspectTarget.transform.InverseTransformPoint(transform.position).normalized;
 						rotateRadius = 2.0f;
 					}
+
+					if(hit.collider.gameObject.tag == "SpaceUnit") {
+						mode = CameraMode.Move;
+						previousMode = CameraMode.Panning;
+						moveTarget = hit.collider.gameObject;
+					}
 				}
 			}
 		}

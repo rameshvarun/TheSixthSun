@@ -24,6 +24,9 @@ public static class MapGenerators {
 			//Add a colonist to the test planet
 			testPlanet.landObjects.Add(new GroundUnit(0, GroundUnit.Colonist, null));
 
+			//Add test space units
+			gameState.spaceUnits.Add(new Spaceship(new HexCoord(-1, -1), Spaceship.TestShip, null));
+
 			//Put one star at the center of the map
 			Star star = new Star(new HexCoord(0,0), "General Star", "Placeholder description.");
 			gameState.stars.Add(star);

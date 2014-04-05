@@ -12,7 +12,6 @@ public class GroundUnit : ILandObject, IUnit
 	/// <summary>This is the node on the planets surface that a ground unit is on. Set to null if on a cargo ship.</summary> 
 	public int node { get; set; }
 	public Player owner { get; set; }
-	public float hp { get; set; }
 
 	/// <summary>Whether or not the unit has already performed an action this turn. </summary>
 	public bool hasMoved;

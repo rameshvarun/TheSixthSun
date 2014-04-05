@@ -181,6 +181,10 @@ MonoBehaviour:
   - colonist
   groundUnits_values:
   - {fileID: 400000, guid: cfd86af0d37ceca47aeaaafd65e79d9d, type: 2}
+  spaceUnits_keys:
+  - testship
+  spaceUnits_values:
+  - {fileID: 400000, guid: 696b4bf0b64d37743947ab047076c0da, type: 2}
 --- !u!1 &1633537118
 GameObject:
   m_ObjectHideFlags: 0

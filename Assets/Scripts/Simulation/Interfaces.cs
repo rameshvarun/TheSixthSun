@@ -16,13 +16,16 @@ public interface ILandObject {
 /// <summary>Basic interface for a unit with health and a controlling player</summary>
 public interface IUnit {
 	Player owner { get; }
-	float hp { get; }
 
 	/// <summary>
 	/// This function should return if the unit is able to make a new move this turn.
 	/// This can be used to cycle through all units, ensuring that the player has made all possible moves.
 	/// </summary>
 	bool canMove();
+}
+
+/// <summary>Interface that represents all movable units in space. This can either be an individual ship, or a fleet. </summary>
+public interface ISpaceUnit : IUnit, ISpaceObject {
 }
 
 public interface IInspectable {

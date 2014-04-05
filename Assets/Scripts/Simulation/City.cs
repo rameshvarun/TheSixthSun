@@ -17,9 +17,6 @@ public class City : ILandObject, IUnit
 	/// <summary>The player who owns this city </summary>
 	public Player owner { get; set; }
 
-	/// <summary>Health points of the city.</summary>
-	public float hp { get; set; }
-
 	/// <summary>The city can make a move if it is not building anything.</summary>
 	public bool canMove() { return currentProject == null; }
 
