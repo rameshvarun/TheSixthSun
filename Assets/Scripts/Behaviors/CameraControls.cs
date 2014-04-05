@@ -32,7 +32,7 @@ public class CameraControls : MonoBehaviour {
 
 	private float maxTileRadius;
 
-	private CameraMode mode = CameraMode.Panning;
+	public CameraMode mode = CameraMode.Panning;
 	private GameObject inspectTarget;
 
 	private GameObject gameController;
