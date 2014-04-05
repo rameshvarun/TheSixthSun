@@ -1,5 +1,6 @@
 ﻿	using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class CameraControls : MonoBehaviour {
 
@@ -24,6 +25,8 @@ public class CameraControls : MonoBehaviour {
 	public float maximumHeight = 35.0f;
 	public float minRotateRadius = 2.0f;
 
+	private float maxTileRadius;
+
 	private CameraMode mode = CameraMode.Panning;
 	private GameObject inspectTarget;
 
@@ -32,6 +35,10 @@ public class CameraControls : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		gameController = GameObject.FindGameObjectWithTag("GameController");
+		maxTileRadius = 0;
+		foreach (KeyValuePair<HexCoord, int> tile in GameState.Instance.grid.tiles) {
+			if(tile.Key.toPosition(1).magnitude > maxTileRadius) maxTileRadius = tile.Key.toPosition(1).magnitude;
+		}
 	}
 	
 	// Update is called once per frame
@@ -42,6 +49,14 @@ public class CameraControls : MonoBehaviour {
 			Vector3 targetPosition = new Vector3(gridPosX + xDisplacement, cameraHeight, gridPosY);
 			transform.position = Vector3.Lerp(transform.position, targetPosition, 0.1f);
 			transform.LookAt(new Vector3(gridPosX, 0, gridPosY));
+
+			Vector3 newPosition = new Vector3(gridPosX, 0, gridPosY);
+			if(newPosition.magnitude > maxTileRadius){
+				newPosition.Normalize();
+				newPosition *= maxTileRadius;
+				gridPosX = newPosition.x;
+				gridPosY = newPosition.z;
+			}
 
 			#if UNITY_EDITOR
 				//Mouse-wheel scrolling
@@ -74,7 +89,7 @@ public class CameraControls : MonoBehaviour {
 			#endif
 			#if UNITY_EDITOR
 				//Mouse Based Panning
-				if( Input.mousePosition.x < mouseMargin || Input.mousePosition.x > Screen.width - mouseMargin ||
+				if(Input.mousePosition.x < mouseMargin || Input.mousePosition.x > Screen.width - mouseMargin ||
 				   Input.mousePosition.y < mouseMargin || Input.mousePosition.y > Screen.height - mouseMargin ) {
 					Vector2 move = new Vector3( Input.mousePosition.x - Screen.width/2, Input.mousePosition.y - Screen.height/2);
 					move.Normalize();
@@ -110,14 +125,15 @@ public class CameraControls : MonoBehaviour {
 			Vector2 move = new Vector2();
 			#if UNITY_ANDROID
 				//Touch based panning
+				
 				if(Input.touchCount == 1) {
 					move = -Input.GetTouch(0).deltaPosition;
 				}
 			#endif
 			#if UNITY_EDITOR
 				//Mouse Based Panning
-				if( Input.mousePosition.x < mouseMargin || Input.mousePosition.x > Screen.width - mouseMargin ||
-				   Input.mousePosition.y < mouseMargin || Input.mousePosition.y > Screen.height - mouseMargin ) {
+				if(Input.mousePosition.x < mouseMargin || Input.mousePosition.x > Screen.width - mouseMargin ||
+				   Input.mousePosition.y < mouseMargin || Input.mousePosition.y > Screen.height - mouseMargin){
 					move = new Vector3( Input.mousePosition.x - Screen.width/2, Input.mousePosition.y - Screen.height/2);
 					move.Normalize();
 				}
