@@ -86,7 +86,7 @@ public class CameraControls : MonoBehaviour {
 
 				//Multi-touch scroll
 				if(Input.touchCount == 2 ) {
-					cameraHeight /= Pow(touchScroll(),3.0);
+					cameraHeight /= (float)(Math.Pow(touchScroll(),3.0));
 				}
 			#endif
 
@@ -137,7 +137,7 @@ public class CameraControls : MonoBehaviour {
 			
 			//Touch based scrolling
 			if(Input.touchCount == 2 ) {
-				rotateRadius /= Pow(touchScroll(),3.0);
+				rotateRadius /= (float)(Math.Pow(touchScroll(),3.0));
 			}
 			#endif
 
@@ -183,11 +183,10 @@ public class CameraControls : MonoBehaviour {
 
 	void OnGUI() {
 		if(mode == CameraMode.Move) {
-			if (GUI.Button(new Rect(10, 10, 150, 100), "Back"))
+			if ( GUI.Button(new Rect(10, 10, 150, 100), "Back") || moveTarget.GetComponent<UnitBehavior>().MoveGUI() ) {
 				mode = previousMode;
-
-			if(moveTarget.GetComponent<UnitBehavior>().MoveGUI())
-				mode = previousMode;
+				moveTarget.GetComponent<UnitBehavior>().cleanUp();
+			}
 		}
 	}
 

@@ -2,6 +2,11 @@
 using System.Collections;
 
 public static class MapGenerators {
+
+	/// <summary>
+	/// Generate a standard map - supports 2 to 3 players.
+	/// </summary>
+	/// <param name="gameState">The GameState object to be populated with a playable match.</param>
 	public static void BasicMap(GameState gameState) {
 		//Standard map for player counts of 3 or less
 		if(gameState.players.Count <= 3) {
