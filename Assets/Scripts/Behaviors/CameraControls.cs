@@ -3,9 +3,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+/// Camera controls. Details the camera modes necessary for close-up interaction with planets and ground units, and space units.
+/// </summary>
 public class CameraControls : MonoBehaviour {
 
-	enum CameraMode {
+	/// <summary>Camera mode enumeration of those currently in use.</summary>
+	public enum CameraMode {
 		/// <summary>Panning in the global space view.</summary>
 		Panning,
 		Planet,
@@ -34,6 +38,9 @@ public class CameraControls : MonoBehaviour {
 	private GameObject gameController;
 
 	// Use this for initialization
+	/// <summary>
+	/// Initializes the game controller and defines the outer limits of the gameplay area.
+	/// </summary>
 	void Start () {
 		gameController = GameObject.FindGameObjectWithTag("GameController");
 		maxTileRadius = 0;
@@ -43,8 +50,12 @@ public class CameraControls : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
+	/// <summary>
+	/// Regulates camera behavior and movement based on the mode in which the camera is in, also providing for transitions between different modes.
+	/// </summary>
 	void Update () {
 
+		//Panning mode: used to view overall hex tile map in space.
 		if(mode == CameraMode.Panning) {
 			//Set Camera position
 			transform.position = new Vector3(gridPosX + xDisplacement, transform.position.y, gridPosY);
@@ -113,6 +124,7 @@ public class CameraControls : MonoBehaviour {
 			}
 		}
 
+		//Planet mode: camera rotates around the planet to view ground hex map for a specific planet.
 		if( mode == CameraMode.Planet ) {
 
 			transform.position = Vector3.Lerp(transform.position, inspectTarget.transform.TransformPoint(inspectDisplacement*rotateRadius), 0.2f);
@@ -161,6 +173,7 @@ public class CameraControls : MonoBehaviour {
 			}
 		}
 
+		//Move mode: used to select units; activates the GUI with specific action options
 		if(mode == CameraMode.Move) {
 			Quaternion targetRotation = Quaternion.LookRotation(moveTarget.transform.position - transform.position);
 			transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, 10.0f*Time.deltaTime);
@@ -169,6 +182,7 @@ public class CameraControls : MonoBehaviour {
 			transform.position = Vector3.Lerp(transform.position, targetPosition, 5.0f*Time.deltaTime);
 		}
 
+		//Returning mode: Used to move back from a planet.
 		if( mode == CameraMode.Returning ) {
 			Vector3 targetPosition = new Vector3(gridPosX + xDisplacement, cameraHeight, gridPosY);
 			Quaternion targetOrientation = Quaternion.LookRotation(new Vector3(gridPosX, 0, gridPosY) - targetPosition);
@@ -181,6 +195,9 @@ public class CameraControls : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// Adds GUI options on top of the camera - allows the user to go back a mode.
+	/// </summary>
 	void OnGUI() {
 		if(mode == CameraMode.Move) {
 			if ( GUI.Button(new Rect(10, 10, 150, 100), "Back") || moveTarget.GetComponent<UnitBehavior>().MoveGUI() ) {
@@ -190,6 +207,10 @@ public class CameraControls : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// Pans over the map using the mouse if it's in the margin of the screen.
+	/// </summary>
+	/// <param name="move">Vector that controls direction of movement - values modified/created by function</param>
 	void mousePanning(ref Vector2 move){
 
 		if(Input.mousePosition.x < mouseMargin || Input.mousePosition.x > Screen.width - mouseMargin ||
@@ -211,6 +232,10 @@ public class CameraControls : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// Scrolls in and out of the map using touch controls.
+	/// </summary>
+	/// <returns>The scale of the scroll to be used to edit camera height</returns>
 	double touchScroll(){
 
 		Vector2 touchDifference = Input.GetTouch(0).position - Input.GetTouch(1).position;
