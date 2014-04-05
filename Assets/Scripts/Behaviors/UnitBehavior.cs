@@ -10,5 +10,9 @@ public class UnitBehavior : MonoBehaviour
 	public virtual bool MoveGUI() {
 		throw new System.NotImplementedException();
 	}
+
+	public virtual void cleanUp() {
+		throw new System.NotImplementedException();
+	}
 }
 

@@ -36,10 +36,12 @@ public class HexPlanet : MonoBehaviour {
 		return nearest_node;
 	}
 
+	/// <summary>Converts a node index to a position. Should be used for placing units and buildings.</summary>
 	public Vector3 getNodePosition(int node) {
 		return node_to_vertex[node];
 	}
 
+	/// <summary> Returns the Orientation that an object stationed on a particular node should have. </summary>
 	public Quaternion getNodeOrientation(int node) {
 		return Quaternion.LookRotation(Vector3.Cross(getNodePosition(node).normalized, Vector3.forward), getNodePosition(node).normalized);
 	}

@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using LitJson;
 
 /// <summary>Class that represents a spaceship unit.</summary>
 public class Spaceship : ISpaceUnit {
@@ -25,20 +26,21 @@ public class Spaceship : ISpaceUnit {
 		this.type = type;
 		this.owner = owner;
 	}
+
+	private static JsonData balance = null;
+
+	/// <summary>
+	/// Gets the balance data, loaded from the JSON file "Balance/space_units." This contains balance data for space units, such as movement ranges, hp, and attack values.
+	/// </summary>
+	/// <value>The balance.</value>
+	public static JsonData Balance {
+		get {
+			if(balance == null) {
+				TextAsset jsonString = Resources.Load<TextAsset>("Balance/space_units");
+				balance = JsonMapper.ToObject(jsonString.text);
+			}
+			return balance;
+		}
+	}
 }
 
-public class Fleet : ISpaceUnit {
-	/// <summary>A list of ships that are part of the given fleet.</summary>
-	List<Spaceship> ships = new List<Spaceship>();
-
-	/// <summary>Location of the fleet in space.</summary>
-	public HexCoord coordinate { get; set; }
-
-	/// <summary>The player that has control over the current unit.</summary>
-	public Player owner { get; set; }
-	
-	/// <summary>Whether or not the unit has already performed an action this turn. </summary>
-	public bool hasMoved;
-	
-	public bool canMove() { return !hasMoved; }
-}

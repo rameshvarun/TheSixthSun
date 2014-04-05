@@ -1,6 +1,4 @@
 {
-	"2" : {
-		"city_project_radius" : 1,
-		"planet_city_max" : 3
-	}
+	"city_project_radius" : 1,
+	"planet_city_max" : 3
 }

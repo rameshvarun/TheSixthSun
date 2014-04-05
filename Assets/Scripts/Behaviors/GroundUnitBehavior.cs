@@ -7,10 +7,14 @@ public class GroundUnitBehavior : UnitBehavior {
 	/// <summary>The simulation GroundUnit object.</summary>
 	public GroundUnit groundUnit;
 
-	/// <summary> The Game Object representing the Planet that this unit is on.</summary>
+	/// <summary> The Game Object representing the GameObject of the Planet that this unit is on.</summary>
 	public Transform planet;
+
+	/// <summary>The HexPlanet object, in order to get references to node positions,
+	/// for placing move selectors and move targets.</summary>
 	public HexPlanet hexPlanet;
 
+	/// <summary>Should refer to the prefab that will be instantiated as a move selector.</summary>
 	public Transform moveSelector;
 
 	private List<Transform> moveSelectors = new List<Transform>();
@@ -38,10 +42,19 @@ public class GroundUnitBehavior : UnitBehavior {
 		moveSelectors.Clear();
 	}
 
+	public override void cleanUp() {
+		this.clearMoveSelectors();
+	}
+
 	public override bool MoveGUI() {
 		if(groundUnit.canMove()) {
 			if (GUI.Button(new Rect(200, 10, 150, 100), "Move")) {
+				//Delete move selectors if there were any
+				this.clearMoveSelectors();
+
 				int movement_range = (int)(GroundUnit.Balance[groundUnit.type]["move"]);
+
+				//Construct movement selectors
 				foreach(int node in hexPlanet.getMovementRange(groundUnit.node, movement_range)) {
 					Transform selectorTransform = (Transform)Instantiate(moveSelector);
 					selectorTransform.parent = planet;

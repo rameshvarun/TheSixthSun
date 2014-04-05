@@ -10,12 +10,12 @@ public static class MapGenerators {
 				for(int y = -radius; y < radius; ++y) {
 					for(int z = -radius; z < radius; ++z) {
 						if(x + y + z == 0)
-							gameState.grid.tiles[new HexCoord(x, y, z)] = 0;
+							gameState.grid.tiles[new HexCoord(x, y, z)] = HexGrid.SpaceTile;
 					}
 				}
 			}
 
-			//Randomly distribute asteroids in circleish around the sun
+			//TODO: Randomly distribute asteroid tiles in circleish around the sun
 
 			//Single test planet
 			Planet testPlanet = new Planet(new HexCoord(-2, -2), "Test Planet", "Placeholder description", 2);
