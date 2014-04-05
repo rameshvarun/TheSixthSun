@@ -1,4 +1,5 @@
-﻿	using UnityEngine;
+﻿using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -43,6 +44,7 @@ public class CameraControls : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+
 		if(mode == CameraMode.Panning) {
 			//Set Camera position
 			transform.position = new Vector3(gridPosX + xDisplacement, transform.position.y, gridPosY);
@@ -51,6 +53,7 @@ public class CameraControls : MonoBehaviour {
 			transform.LookAt(new Vector3(gridPosX, 0, gridPosY));
 
 			Vector3 newPosition = new Vector3(gridPosX, 0, gridPosY);
+			//limit camera to the game board
 			if(newPosition.magnitude > maxTileRadius){
 				newPosition.Normalize();
 				newPosition *= maxTileRadius;
@@ -58,43 +61,32 @@ public class CameraControls : MonoBehaviour {
 				gridPosY = newPosition.z;
 			}
 
-			#if UNITY_EDITOR
-				//Mouse-wheel scrolling
-				cameraHeight -= scrollSpeed*Input.GetAxis("Mouse ScrollWheel");
-			#endif
-			#if UNITY_ANDROID
-				//Multi-touch scroll
-				if(Input.touchCount == 2 ) {
-					Vector2 touchDifference = Input.GetTouch(0).position - Input.GetTouch(1).position;
-					Vector2 previousTouchDifference = (Input.GetTouch(0).position - Input.GetTouch(0).deltaPosition) - (Input.GetTouch(1).position - Input.GetTouch(1).deltaPosition);
-					float scale = touchDifference.magnitude / previousTouchDifference.magnitude;
-					
-					cameraHeight /= scale*scale*scale;
-				}
-			#endif
 			cameraHeight = Mathf.Clamp( cameraHeight, minimumHeight, maximumHeight );
-
 
 			//Get Panning Speed
 			float moveSpeed = baseMoveSpeed*cameraHeight;
 			moveSpeed = Mathf.Max(minimumMoveSpeed, moveSpeed)*Time.deltaTime;
 
+			Vector2 move = new Vector2();
+
+			#if UNITY_EDITOR
+				//Mouse Based Panning
+				mousePanning(ref move);
+
+				//Mouse-wheel scrolling
+				cameraHeight -= scrollSpeed*Input.GetAxis("Mouse ScrollWheel");
+			#endif
 			#if UNITY_ANDROID
 				//Touch based panning
 				if(Input.touchCount == 1) {
-					Vector2 move = -Input.GetTouch(0).deltaPosition;
+					move = -Input.GetTouch(0).deltaPosition;
 					gridPosY += move.x*moveSpeed;
 					gridPosX -= move.y*moveSpeed;
 				}
-			#endif
-			#if UNITY_EDITOR
-				//Mouse Based Panning
-				if(Input.mousePosition.x < mouseMargin || Input.mousePosition.x > Screen.width - mouseMargin ||
-				   Input.mousePosition.y < mouseMargin || Input.mousePosition.y > Screen.height - mouseMargin ) {
-					Vector2 move = new Vector3( Input.mousePosition.x - Screen.width/2, Input.mousePosition.y - Screen.height/2);
-					move.Normalize();
-					gridPosY += move.x*moveSpeed;
-					gridPosX -= move.y*moveSpeed;
+
+				//Multi-touch scroll
+				if(Input.touchCount == 2 ) {
+					cameraHeight /= Pow(touchScroll(),3.0);
 				}
 			#endif
 
@@ -129,37 +121,28 @@ public class CameraControls : MonoBehaviour {
 			transform.rotation = Quaternion.Lerp(transform.rotation, q, 0.5f);
 
 			Vector2 move = new Vector2();
-			#if UNITY_ANDROID
-				//Touch based panning
-				
-				if(Input.touchCount == 1) {
-					move = -Input.GetTouch(0).deltaPosition;
-				}
-			#endif
+
 			#if UNITY_EDITOR
 				//Mouse Based Panning
-				if(Input.mousePosition.x < mouseMargin || Input.mousePosition.x > Screen.width - mouseMargin ||
-				   Input.mousePosition.y < mouseMargin || Input.mousePosition.y > Screen.height - mouseMargin){
-					move = new Vector3( Input.mousePosition.x - Screen.width/2, Input.mousePosition.y - Screen.height/2);
-					move.Normalize();
-				}
-			#endif
-			inspectDisplacement = Quaternion.AngleAxis(-move.x, Vector3.up)*inspectDisplacement;
-			inspectDisplacement = Quaternion.AngleAxis(-move.y, Vector3.Cross(Vector3.up, inspectDisplacement))*inspectDisplacement;
+				mousePanning(ref move);
 
-			#if UNITY_ANDROID
-				if(Input.touchCount == 2 ) {
-					//Exit with a pinch gesture
-					Vector2 touchDifference = Input.GetTouch(0).position - Input.GetTouch(1).position;
-					Vector2 previousTouchDifference = (Input.GetTouch(0).position - Input.GetTouch(0).deltaPosition) - (Input.GetTouch(1).position - Input.GetTouch(1).deltaPosition);
-					float scale = touchDifference.magnitude / previousTouchDifference.magnitude;
-					rotateRadius /= scale*scale*scale;
-				}
-			#endif
-
-			#if UNITY_EDITOR
+				//Mouse based scrolling
 				rotateRadius -= Input.GetAxis("Mouse ScrollWheel");
 			#endif
+			#if UNITY_ANDROID
+			//Touch based panning
+			if(Input.touchCount == 1) {
+				move = -Input.GetTouch(0).deltaPosition;
+			}
+			
+			//Touch based scrolling
+			if(Input.touchCount == 2 ) {
+				rotateRadius /= Pow(touchScroll(),3.0);
+			}
+			#endif
+
+			inspectDisplacement = Quaternion.AngleAxis(-move.x, Vector3.up)*inspectDisplacement;
+			inspectDisplacement = Quaternion.AngleAxis(-move.y, Vector3.Cross(Vector3.up, inspectDisplacement))*inspectDisplacement;
 
 			if(rotateRadius > 3.5f) mode = CameraMode.Returning;
 			if(rotateRadius < minRotateRadius) rotateRadius = minRotateRadius;
@@ -208,9 +191,37 @@ public class CameraControls : MonoBehaviour {
 		}
 	}
 
+	void mousePanning(ref Vector2 move){
+
+		if(Input.mousePosition.x < mouseMargin || Input.mousePosition.x > Screen.width - mouseMargin ||
+		   Input.mousePosition.y < mouseMargin || Input.mousePosition.y > Screen.height - mouseMargin ) {
+
+			move = new Vector3(Input.mousePosition.x - Screen.width/2, Input.mousePosition.y - Screen.height/2);
+			move.Normalize();
+
+			if(mode == CameraMode.Panning){
+
+				//Get Panning Speed
+				float moveSpeed = baseMoveSpeed*cameraHeight;
+				moveSpeed = Mathf.Max(minimumMoveSpeed, moveSpeed)*Time.deltaTime;
+
+				//move grid position
+				gridPosY += move.x*moveSpeed;
+				gridPosX -= move.y*moveSpeed;
+			}
+		}
+	}
+
+	double touchScroll(){
+
+		Vector2 touchDifference = Input.GetTouch(0).position - Input.GetTouch(1).position;
+		Vector2 previousTouchDifference = (Input.GetTouch(0).position - Input.GetTouch(0).deltaPosition) - (Input.GetTouch(1).position - Input.GetTouch(1).deltaPosition);
+		return touchDifference.magnitude / previousTouchDifference.magnitude;
+	}
+
 	private GameObject moveTarget;
 	private CameraMode previousMode;
 
-	Vector3 inspectDisplacement;
-	float rotateRadius;
+	private Vector3 inspectDisplacement;
+	private float rotateRadius;
 }
