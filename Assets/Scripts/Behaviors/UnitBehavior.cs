@@ -9,7 +9,6 @@ public class UnitBehavior : MonoBehaviour
 
 	public virtual bool MoveGUI() {
 		throw new System.NotImplementedException();
-		return false;
 	}
 }
 

@@ -8,6 +8,9 @@ public class GameState {
 	
 	public List<Player> players = new List<Player>();
 
+	/// <summary>Stores the player who is currently taking their turn.</summary>
+	public Player currentPlayer;
+
 	public List<Planet> planets = new List<Planet>();
 	public List<Star> stars = new List<Star>();
 
