@@ -47,7 +47,7 @@ public class GroundUnitBehavior : UnitBehavior {
 	}
 
 	public override bool MoveGUI() {
-		if(groundUnit.canMove()) {
+		if(groundUnit.canMove() && groundUnit.owner == GameState.Instance.currentPlayer && GameState.isMyTurn()) {
 			if (GUI.Button(new Rect(200, 10, 150, 100), "Move")) {
 				//Delete move selectors if there were any
 				this.clearMoveSelectors();

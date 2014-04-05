@@ -25,7 +25,14 @@ public class SceneBuilder : MonoBehaviour {
 		for(int i = 0; i < groundUnits_keys.Count; ++i) groundUnits[groundUnits_keys[i]] = groundUnits_values[i];
 		for(int i = 0; i < spaceUnits_keys.Count; ++i) spaceUnits[spaceUnits_keys[i]] = spaceUnits_values[i];
 
+		//Create empty game state with three players
 		GameState.Instance = new GameState();
+		GameState.Instance.players.Add(new Player());
+		GameState.Instance.players.Add(new Player());
+		GameState.Instance.players.Add(new Player());
+		GameState.Instance.currentPlayer = GameState.Instance.players[0];
+
+		//Populate game state
 		MapGenerators.BasicMap(GameState.Instance);
 
 		//Create empty space grid

@@ -12,7 +12,12 @@ public class HexGrid
 	public HexGrid() {
 	}
 
-
+	/// <summary>
+	/// Returns all of the tiles within the movement range of the given tile.
+	/// </summary>
+	/// <returns>A HashSet of HexCoord objects that are reachable.</returns>
+	/// <param name="startNode">The coordinate of the starting point.</param>
+	/// <param name="range">The movement range of the given unit.</param>
 	public HashSet<HexCoord> getMovementRange(HexCoord startNode, int range) {
 		HashSet<HexCoord> moveableTiles = new HashSet<HexCoord>();
 

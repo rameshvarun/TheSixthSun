@@ -10,7 +10,7 @@ public static class MapGenerators {
 	public static void BasicMap(GameState gameState) {
 		//Standard map for player counts of 3 or less
 		if(gameState.players.Count <= 3) {
-			int radius = 10;
+			int radius = 11;
 			for(int x = -radius; x < radius; ++x) {
 				for(int y = -radius; y < radius; ++y) {
 					for(int z = -radius; z < radius; ++z) {
@@ -21,20 +21,39 @@ public static class MapGenerators {
 			}
 
 			//TODO: Randomly distribute asteroid tiles in circleish around the sun
+			int planet_radius = radius - 3;
 
-			//Single test planet
-			Planet testPlanet = new Planet(new HexCoord(-2, -2), "Test Planet", "Placeholder description", 2);
-			gameState.planets.Add(testPlanet);
+			//Create planets in symmetrical locations
+			const int start_planet_subdiv = 2;
+			gameState.planets.Add(new Planet(new HexCoord(-planet_radius, 0), "Test Planet", "Placeholder description", start_planet_subdiv));
+			gameState.planets.Add(new Planet(new HexCoord(planet_radius, 0), "Test Planet", "Placeholder description", start_planet_subdiv));
 
-			//Add a colonist to the test planet
+			gameState.planets.Add(new Planet(new HexCoord(0, -planet_radius), "Test Planet", "Placeholder description", start_planet_subdiv));
+			gameState.planets.Add(new Planet(new HexCoord(0, planet_radius), "Test Planet", "Placeholder description", start_planet_subdiv));
+
+			gameState.planets.Add(new Planet(new HexCoord(planet_radius, -planet_radius), "Test Planet", "Placeholder description", start_planet_subdiv));
+			gameState.planets.Add(new Planet(new HexCoord(-planet_radius, planet_radius), "Test Planet", "Placeholder description", start_planet_subdiv));
+
+			//Seed colonist units
+			if(gameState.players.Count == 2) {
+				gameState.planets[4].landObjects.Add(new GroundUnit(0, GroundUnit.Colonist, gameState.players[0]));
+				gameState.planets[5].landObjects.Add(new GroundUnit(0, GroundUnit.Colonist, gameState.players[1]));
+			}
+			if(gameState.players.Count == 3) {
+				gameState.planets[2].landObjects.Add(new GroundUnit(0, GroundUnit.Colonist, gameState.players[0]));
+				gameState.planets[5].landObjects.Add(new GroundUnit(0, GroundUnit.Colonist, gameState.players[1]));
+				gameState.planets[1].landObjects.Add(new GroundUnit(0, GroundUnit.Colonist, gameState.players[2]));
+			}
+
+			/*//Add a colonist to the test planet
 			testPlanet.landObjects.Add(new GroundUnit(0, GroundUnit.Colonist, null));
 
 			//Add test space units
 			gameState.spaceUnits.Add(new Spaceship(new HexCoord(-1, -1), Spaceship.TestShip, null));
-
+			*/
+			
 			//Put one star at the center of the map
-			Star star = new Star(new HexCoord(0,0), "General Star", "Placeholder description.");
-			gameState.stars.Add(star);
+			gameState.stars.Add(new Star(new HexCoord(0,0), "General Star", "Placeholder description."));
 
 			return;
 		}
