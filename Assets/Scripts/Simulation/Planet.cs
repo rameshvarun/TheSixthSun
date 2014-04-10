@@ -23,5 +23,15 @@ public class Planet : ISpaceObject {
 		this.name = name;
 		this.description = description;
 		this.subdivisions = subdivisions;
+
+		//Generate array for storing terrain
+		Dictionary<int, HashSet<int>> graph = HexPlanet.createOnlyPlanetGraph(subdivisions);
+		terrain = new int[graph.Count];
+
+		//Randomize terrain
+		for(int i = 0; i < terrain.Length; ++i) {
+			terrain[i] = Random.Range(0, 6);
+		}
+
 	}
 }

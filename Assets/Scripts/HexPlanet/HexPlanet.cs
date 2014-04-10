@@ -98,19 +98,31 @@ public class HexPlanet : MonoBehaviour {
 	}
 
 	/// <summary>
-	/// When called, this function actually constructs the planet mesh, subdivides, and calculates the vertex-edge graph.
+	/// A static function that can construct a Planet's vertex-edge graph
+	/// without actually creating the mesh. The purpose of this is so that in the
+	/// Map Generation phase, we can generate terrain features (this requires the vertex-edge graph)
+	/// without actually constructing the mesh.
 	/// </summary>
-	public void CreatePlanet() {
-		graph = new Dictionary<int, HashSet<int>>();
-		vertex_to_node = new Dictionary<Vector3, int>();
-		node_to_vertex = new Dictionary<int, Vector3>();
+	/// <returns>A vertex-edge graph that represents the surface of the planet.</returns>
+	public static Dictionary<int, HashSet<int>> createOnlyPlanetGraph(int subdivisions) {
+		List<Triangle> triangles = generatePlanetTriangles(subdivisions);
+	
+		Dictionary<Vector3, int> vertex_to_node;
+		Dictionary<int, Vector3> node_to_vertex;
 
-		mesh = new Mesh();
-		GetComponent<MeshFilter>().mesh = mesh;
+		//Generate lookup tables
+		generateLookups(triangles, out vertex_to_node, out node_to_vertex);
 		
-		List<Triangle> triangles = HexPlanetUtils.generateIcosohedron();
+		//Generate vertex-edge graph
+		return generatePlanetGraph(vertex_to_node, triangles);
+	}
 
-		for(int i = 0; i < GetComponent<PlanetBehavior>().planet.subdivisions; ++i) {
+	private static List<Triangle> generatePlanetTriangles(int subdivisions) {
+		Debug.Log("Generating triangles for planet...");
+
+		List<Triangle> triangles = HexPlanetUtils.generateIcosohedron();
+		
+		for(int i = 0; i < subdivisions; ++i) {
 			Debug.Log("Subdividing...");
 			//Subdivision phase
 			List<Triangle> newTriangles = new List<Triangle>();
@@ -126,42 +138,20 @@ public class HexPlanet : MonoBehaviour {
 			}
 			triangles = newTriangles;
 		}
-		
-		
-		mesh.vertices = Triangle.ToVertices(triangles);
-		mesh.triangles = Triangle.ToIndices(triangles);
-		
-		//Generate UV Coordinates
-		foreach(Triangle triangle in triangles) {
-			triangle.i_uv = new Vector2(0.5f, -0.94999f);
-			triangle.j_uv = new Vector2(0.8897f, -0.275f);
-			triangle.k_uv = new Vector2(0.1103f, -0.275f);
-		}
-		mesh.uv = Triangle.ToUVS(triangles);
-		
-		//Calculate smoothed normals
-		List<Vector3> normals = new List<Vector3>(mesh.vertices.Length);
-		foreach(Vector3 vertex in mesh.vertices) normals.Add(vertex);
-		mesh.normals = normals.ToArray();
-		
+
+		return triangles;
+	}
+
+	private static Dictionary<int, HashSet<int>> generatePlanetGraph(Dictionary<Vector3, int> vertex_to_node, List<Triangle> triangles) {
 		Debug.Log("Creating node-edge graph from mesh.");
-		
-		//Generate node-edge graph
-		int id = 0;
-		foreach(Vector3 vertex in mesh.vertices) {
-			if(!vertex_to_node.ContainsKey(vertex)) {
-				//Enable hashing in both directions
-				vertex_to_node[vertex] = id;
-				node_to_vertex[id] = vertex;
-				++id;
-			}
-		}
+
+		Dictionary<int, HashSet<int>> graph = new Dictionary<int, HashSet<int>>();
 
 		//Initialize empty edge lists
 		foreach(int node in vertex_to_node.Values) {
 			graph[node] = new HashSet<int>();
 		}
-
+		
 		//Populate edge lists
 		foreach(Triangle triangle in triangles) {
 			//Add all possible edges to edge graph
@@ -174,6 +164,67 @@ public class HexPlanet : MonoBehaviour {
 			graph[vertex_to_node[triangle.k]].Add(vertex_to_node[triangle.i]);
 			graph[vertex_to_node[triangle.k]].Add(vertex_to_node[triangle.j]);
 		}
+
+		return graph;
+	}
+
+	private static void generateLookups(List<Triangle> triangles,
+	                                   out Dictionary<Vector3, int> vertex_to_node,
+	                                   out Dictionary<int, Vector3> node_to_vertex) {
+
+		vertex_to_node = new Dictionary<Vector3, int>();
+		node_to_vertex = new Dictionary<int, Vector3>();
+
+		//Generate node-edge graph
+		int id = 0;
+		foreach(Vector3 vertex in Triangle.ToVertices(triangles)) {
+			if(!vertex_to_node.ContainsKey(vertex)) {
+				//Enable hashing in both directions
+				vertex_to_node[vertex] = id;
+				node_to_vertex[id] = vertex;
+				++id;
+			}
+		}
+	}
+
+	private static void populateUVCoordinates(List<Triangle> triangles, Dictionary<Vector3, int> vertex_to_node, int[] terrain) {
+		//Generate UV Coordinates
+		foreach(Triangle triangle in triangles) {
+			triangle.i_uv = new Vector2(0.5f, -0.94999f);
+			triangle.j_uv = new Vector2(0.8897f, -0.275f);
+			triangle.k_uv = new Vector2(0.1103f, -0.275f);
+		}
+	}
+
+	/// <summary>
+	/// When called, this function actually constructs the planet mesh, subdivides, and calculates the vertex-edge graph.
+	/// To generate the vertex-edge graph without actually making a planet, see createOnlyPlanetGraph.
+	/// </summary>
+	public void CreatePlanet() {
+		mesh = new Mesh();
+		GetComponent<MeshFilter>().mesh = mesh;
+		
+		List<Triangle> triangles = generatePlanetTriangles(GetComponent<PlanetBehavior>().planet.subdivisions);
+		
+		mesh.vertices = Triangle.ToVertices(triangles);
+		mesh.triangles = Triangle.ToIndices(triangles);
+
+
+		
+		//Calculate smoothed normals
+		List<Vector3> normals = new List<Vector3>(mesh.vertices.Length);
+		foreach(Vector3 vertex in mesh.vertices) normals.Add(vertex);
+		mesh.normals = normals.ToArray();
+
+		//Generate lookup tables
+		generateLookups(triangles, out vertex_to_node, out node_to_vertex);
+
+		//Calculate texture coordinates
+		populateUVCoordinates(triangles, vertex_to_node, GetComponent<PlanetBehavior>().planet.terrain);
+		mesh.uv = Triangle.ToUVS(triangles);
+
+		//Generate vertex-edge graph
+		graph = generatePlanetGraph(vertex_to_node, triangles);
 		
 		mesh.RecalculateBounds();
 	}
