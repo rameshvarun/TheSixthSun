@@ -32,6 +32,12 @@ public class GameState {
 		currentPlayer = players[(current_player_index + 1) % players.Count];
 
 		if(current_player_index == players.Count - 1) {
+			foreach(Planet planet in planets) {
+				foreach(ILandObject landObject in planet.landObjects) {
+					if(landObject is GroundUnit) ((GroundUnit)landObject).hasMoved = false;
+				}
+			}
+
 			//TODO: Make it so that all units can move again
 		}
 	}

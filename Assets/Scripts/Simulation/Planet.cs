@@ -31,7 +31,10 @@ public class Planet : ISpaceObject {
 		//Randomize terrain
 		for(int i = 0; i < terrain.Length; ++i) {
 			terrain[i] = Random.Range(0, 6);
+			//terrain[i] = 0;
 		}
+		//terrain[0] = 2;
+		//terrain[1] = 2;
 
 	}
 }

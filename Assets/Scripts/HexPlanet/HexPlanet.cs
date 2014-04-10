@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 /// <summary>
 /// The main HexPlanet script.
@@ -187,12 +188,108 @@ public class HexPlanet : MonoBehaviour {
 		}
 	}
 
+	class helper_struct {
+		public int terrain_type;
+		public Vector2 uv;
+		public int order;
+
+		public helper_struct(int terrain_type, int order) {
+			this.terrain_type = terrain_type;
+			this.uv = Vector2.zero;
+			this.order = order;
+		}
+
+		public override string ToString () {
+			return string.Format ("{0}, {2}: {1}", terrain_type, uv, order);
+		}
+	}
+
+	private static List<Vector2> computeCoordinates(int x, int y, int z) {
+		int a = 0;
+		int j = 21;
+		for(int i = 0; i < x; ++i) {
+			a += j;
+			j -= (6 - i);
+		}
+
+		int b = 0;
+		for(int i = 0; i < y; ++i) {
+			if(i < x) continue;
+			b += (6 - i);
+		}
+
+		int c = z - y;
+
+		int TILE_SIZE = 85;
+		int tileX = ((a + b + c) % 7) * TILE_SIZE;
+		int tileY = ((a + b + c) / 7) * TILE_SIZE;
+
+		List<Vector2> points = new List<Vector2>();
+		float t = 0.0f;
+		while(t < Mathf.PI * 2.0) {
+			Vector2 p = new Vector2(Mathf.Sin(t)*0.44f + 0.5f, Mathf.Cos(t)*0.44f + 0.5f );
+			p.x *= TILE_SIZE;
+			p.y *= TILE_SIZE;
+			points.Add(p);
+
+			t += Mathf.PI * (2.0f / 3.0f);
+		}
+
+		List<Vector2> returnPoints = new List<Vector2>();
+		returnPoints.Add(points[0] + new Vector2(tileX, tileY));
+		returnPoints.Add(points[2] + new Vector2(tileX, tileY));
+		returnPoints.Add(points[1] + new Vector2(tileX, tileY));
+
+		return returnPoints;
+	}
+
 	private static void populateUVCoordinates(List<Triangle> triangles, Dictionary<Vector3, int> vertex_to_node, int[] terrain) {
 		//Generate UV Coordinates
 		foreach(Triangle triangle in triangles) {
-			triangle.i_uv = new Vector2(0.5f, -0.94999f);
-			triangle.j_uv = new Vector2(0.8897f, -0.275f);
-			triangle.k_uv = new Vector2(0.1103f, -0.275f);
+			int i = terrain[vertex_to_node[triangle.i]];
+			int j = terrain[vertex_to_node[triangle.j]];
+			int k = terrain[vertex_to_node[triangle.k]];
+
+			List<helper_struct> triples = new List<helper_struct>();
+			triples.Add(new helper_struct(i, 0));
+			triples.Add(new helper_struct(j, 1));
+			triples.Add(new helper_struct(k, 2));
+
+			List<helper_struct> sd = triples.OrderBy(x => x.terrain_type).ToList();
+			Debug.Log(sd[0] + ", " + sd[1] + ", " + sd[2]);
+
+			List<Vector2> coords = computeCoordinates(sd[0].terrain_type, sd[1].terrain_type, sd[2].terrain_type);
+			sd[0].uv = coords[0];
+			sd[1].uv = coords[1];
+			sd[2].uv = coords[2];
+
+			List<helper_struct> resorted = sd.OrderBy(x => x.order).ToList();
+			Debug.Log(resorted[0] + ", " + resorted[1] + ", " + resorted[2]);
+
+			float IMAGE_WIDTH = 595.0f;
+			float IMAGE_HEIGHT = 680.0f;
+
+
+			//Debug.Log(resorted[0].terrain_type + " : " + resorted[0].uv
+			//          + ", " + resorted[1].terrain_type + " : " + resorted[1].uv
+			 //         + ", " + resorted[2].terrain_type + " : " + resorted[2].uv);
+
+			foreach(helper_struct s in resorted) {
+
+				s.uv.x /= IMAGE_WIDTH;
+				s.uv.y = 1 - s.uv.y/IMAGE_HEIGHT;
+			}
+
+			triangle.i_uv = resorted[0].uv;
+			triangle.j_uv = resorted[1].uv;
+			triangle.k_uv = resorted[2].uv;
+
+			/*triangle.i_uv = triples[0].uv;
+			triangle.j_uv = triples[1].uv;
+			triangle.k_uv = triples[2].uv;*/
+			/*triangle.i_uv = new Vector2(42.5f / IMAGE_WIDTH, 1 - (80.75f / IMAGE_HEIGHT));
+			triangle.j_uv = new Vector2(9.37f / IMAGE_WIDTH, 1 - (23.375f / IMAGE_HEIGHT));
+			triangle.k_uv = new Vector2(75.6254f / IMAGE_WIDTH, 1 - (23.375f / IMAGE_HEIGHT));*/
 		}
 	}
 
