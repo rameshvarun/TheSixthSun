@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -12,16 +12,25 @@ public class GroundUnitBehavior : UnitBehavior {
 
 	/// <summary>The HexPlanet object, in order to get references to node positions,
 	/// for placing move selectors and move targets.</summary>
-	public HexPlanet hexPlanet;
+	private HexPlanet hexPlanet;
+	private PlanetBehavior planetBehavior;
+	private SceneBuilder sceneBuilder;
 
 	/// <summary>Should refer to the prefab that will be instantiated as a move selector.</summary>
 	public Transform moveSelector;
 
 	private List<Transform> moveSelectors = new List<Transform>();
 
+	public void Link(GroundUnit groundUnit) {
+		this.groundUnit = groundUnit;
+		this.planet = groundUnit.planet.hexPlanet.transform;
+	}
+
 	// Use this for initialization
 	void Start () {
 		hexPlanet = planet.GetComponent<HexPlanet>();
+		planetBehavior = planet.GetComponent<PlanetBehavior>();
+		sceneBuilder = GameObject.FindGameObjectWithTag("GameController").GetComponent<SceneBuilder>();
 	}
 	
 	// Update is called once per frame
@@ -79,7 +88,23 @@ public class GroundUnitBehavior : UnitBehavior {
 			if(groundUnit.type == GroundUnit.Colonist) {
 				if (GUI.Button(new Rect(600, 10, 150, 100), "Found City")) {
 					groundUnit.hasMoved = true;
-					return true;
+
+					cleanUp();
+
+					planetBehavior.planet.landObjects.Remove(groundUnit);
+					Destroy(gameObject);
+
+
+					City city = new City(groundUnit.node, groundUnit.owner, groundUnit.planet);
+					planetBehavior.planet.landObjects.Add(city);
+
+					//Instantiate
+					Transform cityTransform = sceneBuilder.CreateCity(city);
+					cityTransform.GetComponent<CityBehavior>().AnimateConstruction();
+
+					//Set as current focus target
+					GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraControls>().setFocus(cityTransform.gameObject);
+
 				}
 			}
 		}

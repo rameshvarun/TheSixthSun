@@ -178,6 +178,7 @@ MonoBehaviour:
   hexTile: {fileID: 400000, guid: 7347f467164f26f45b82cec5557540b8, type: 2}
   planet: {fileID: 400000, guid: bae8559aac3f91c449c45f0e455c4929, type: 2}
   star: {fileID: 400000, guid: 8dbdfebaec03d6745b35a29fbb98307d, type: 2}
+  cityTransform: {fileID: 400000, guid: d33d953f2842b694c8ea394bb4f67868, type: 2}
   groundUnits_keys:
   - colonist
   groundUnits_values:

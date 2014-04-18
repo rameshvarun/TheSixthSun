@@ -36,13 +36,13 @@ public static class MapGenerators {
 
 			//Seed colonist units
 			if(gameState.players.Count == 2) {
-				gameState.planets[4].landObjects.Add(new GroundUnit(0, GroundUnit.Colonist, gameState.players[0]));
-				gameState.planets[5].landObjects.Add(new GroundUnit(0, GroundUnit.Colonist, gameState.players[1]));
+				gameState.planets[4].landObjects.Add(new GroundUnit(0, GroundUnit.Colonist, gameState.players[0], gameState.planets[4]));
+				gameState.planets[5].landObjects.Add(new GroundUnit(0, GroundUnit.Colonist, gameState.players[1], gameState.planets[5]));
 			}
 			if(gameState.players.Count == 3) {
-				gameState.planets[2].landObjects.Add(new GroundUnit(0, GroundUnit.Colonist, gameState.players[0]));
-				gameState.planets[5].landObjects.Add(new GroundUnit(0, GroundUnit.Colonist, gameState.players[1]));
-				gameState.planets[1].landObjects.Add(new GroundUnit(0, GroundUnit.Colonist, gameState.players[2]));
+				gameState.planets[2].landObjects.Add(new GroundUnit(0, GroundUnit.Colonist, gameState.players[0], gameState.planets[2]));
+				gameState.planets[5].landObjects.Add(new GroundUnit(0, GroundUnit.Colonist, gameState.players[1], gameState.planets[5]));
+				gameState.planets[1].landObjects.Add(new GroundUnit(0, GroundUnit.Colonist, gameState.players[2], gameState.planets[1]));
 			}
 
 			/*//Add a colonist to the test planet

@@ -11,6 +11,8 @@ public class City : ILandObject, IUnit
 	/// <summary>Number of turns left to construct the current project.</summary>
 	public int projectTurns = 0;
 
+	public Planet planet { get; set; }
+
 	/// <summary>This is the node on the planets surface that the city is on.</summary> 
 	public int node { get; set; }
 
@@ -20,9 +22,12 @@ public class City : ILandObject, IUnit
 	/// <summary>The city can make a move if it is not building anything.</summary>
 	public bool canMove() { return currentProject == null; }
 
-	public City(int node, Player owner) {
+	public CityBehavior behavior;
+
+	public City(int node, Player owner, Planet planet) {
 		this.node = node;
 		this.owner = owner;
+		this.planet = planet;
 	}
 
 	private static JsonData balance = null;

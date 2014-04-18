@@ -13,6 +13,13 @@ public class PlanetBehavior : MonoBehaviour
 
 	}
 
+	public void Link(Planet planet) {
+		this.planet = planet;
+
+		planet.hexPlanet = GetComponent<HexPlanet>();
+		planet.behavior = this;
+	}
+
 	// Update is called once per frame
 	void Update ()
 	{

@@ -9,6 +9,9 @@ public interface ISpaceObject {
 
 /// <summary>Interface for an object that is on the surface of a planet.</summary>
 public interface ILandObject {
+	/// <summary>Maintain a link back to the planet that this object is on.</summary>
+	Planet planet { get; }
+
 	/// <summary>Planet surfaces are modeled as a node-edge graph. This is the node that the object is on</summary> 
 	int node { get; }
 }

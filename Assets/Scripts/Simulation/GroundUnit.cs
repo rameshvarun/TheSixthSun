@@ -9,6 +9,8 @@ public class GroundUnit : ILandObject, IUnit
 	/// <summary>Basic ground infantry unit.</summary>
 	public static string Marine = "marine";
 
+	public Planet planet { get; set; }
+
 	/// <summary>This is the node on the planets surface that a ground unit is on. Set to null if on a cargo ship.</summary> 
 	public int node { get; set; }
 	public Player owner { get; set; }
@@ -19,10 +21,11 @@ public class GroundUnit : ILandObject, IUnit
 	/// <summary>Used to store the type of ground unit.</summary>
 	public string type;
 
-	public GroundUnit(int node, string type, Player owner) {
+	public GroundUnit(int node, string type, Player owner, Planet planet) {
 		this.node = node;
 		this.type = type;
 		this.owner = owner;
+		this.planet = planet;
 
 		hasMoved = false;
 	}

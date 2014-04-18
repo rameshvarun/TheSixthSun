@@ -164,7 +164,7 @@ public class CameraControls : MonoBehaviour {
 				Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 				RaycastHit hit;
 				if(Physics.Raycast(ray, out hit)) {
-					if(hit.collider.gameObject.tag == "GroundUnit") {
+					if(hit.collider.gameObject.tag == "GroundUnit" || hit.collider.gameObject.tag == "City") {
 						mode = CameraMode.Move;
 						previousMode = CameraMode.Planet;
 						moveTarget = hit.collider.gameObject;
@@ -241,6 +241,13 @@ public class CameraControls : MonoBehaviour {
 		Vector2 touchDifference = Input.GetTouch(0).position - Input.GetTouch(1).position;
 		Vector2 previousTouchDifference = (Input.GetTouch(0).position - Input.GetTouch(0).deltaPosition) - (Input.GetTouch(1).position - Input.GetTouch(1).deltaPosition);
 		return touchDifference.magnitude / previousTouchDifference.magnitude;
+	}
+
+	public void setFocus(GameObject targetObject) {
+		if(mode != CameraMode.Move)
+			previousMode = mode;
+		mode = CameraMode.Move;
+		moveTarget = targetObject;
 	}
 
 	private GameObject moveTarget;
