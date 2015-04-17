@@ -52,13 +52,13 @@ public class Planet : ISpaceObject {
 		//Evolve land
 		for(int i = 0; i < 3; ++i) {
 			int[] new_terrain = new int[terrain.Length];
-			System.Array.Copy(terrain, newterrain, terrain.Length);
+			System.Array.Copy(terrain, new_terrain, terrain.Length);
 
 			for(int j = 0; j < terrain.Length; ++j) {
 				if(terrain[j] == GRASSLAND) {
 					foreach(int neighbor in graph[j]) {
 						if(Random.value > 0.1) {
-							newterrain[neighbor] = GRASSLAND;
+							new_terrain[neighbor] = GRASSLAND;
 						}
 					}
 				}
