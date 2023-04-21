@@ -2,8 +2,8 @@
 
 > Hex planets in a hex-based space.
 
-![Image](http://i.imgur.com/wvuF6cX.png)
+![Screenshot](./screenshot.png)
 
 ## Concept Art
 
-![Eagle Warrior](http://i.imgur.com/NGvUtFc.png)
+![Eagle Warrior](./concept-art.png)
